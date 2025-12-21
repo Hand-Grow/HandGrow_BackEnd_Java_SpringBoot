@@ -5,5 +5,6 @@ import com.handgrow.demo.dto.response.DemoUserResponse;
 
 public interface DemoUserService {
     DemoUserResponse demoCreateUser(DemoUserCreationRequest request);
+
     DemoUserResponse demoGetUserById(Long id);
 }

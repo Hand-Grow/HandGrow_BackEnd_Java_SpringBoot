@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class HandGrowBootStrap {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HandGrowBootStrap.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(HandGrowBootStrap.class, args);
+    }
 }

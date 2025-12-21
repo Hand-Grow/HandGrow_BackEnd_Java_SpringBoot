@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfig {
-// Go to http://localhost:8080/swagger-ui/index.html to access the Swagger UI
+    // Go to http://localhost:8080/swagger-ui/index.html to access the Swagger UI
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -17,7 +17,8 @@ public class OpenApiConfig {
                 // Configure JWT Bearer authentication
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new io.swagger.v3.oas.models.Components()
-                        .addSecuritySchemes("bearerAuth",
+                        .addSecuritySchemes(
+                                "bearerAuth",
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")

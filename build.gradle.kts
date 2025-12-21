@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.5.9"
 	id("io.spring.dependency-management") version "1.1.7"
+    id("com.diffplug.spotless") version "6.25.0"
 }
 
 group = "com.handgrow"
@@ -51,3 +52,42 @@ dependencies {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+
+spotless {
+    java {
+        target("src/*/java/**/*.java")
+        // Chọn chuẩn format (Google hoặc Palantir). Palantir đang được ưa chuộng hơn vì ít xuống dòng vô lý.
+        palantirJavaFormat()
+        removeUnusedImports()
+    }
+}
+
+// 👇 Cực kỳ quan trọng: Tạo task để tự động cài Git Hook
+tasks.register("createPreCommitHook") {
+    doLast {
+        val gitHooksDir = File(rootProject.rootDir, ".git/hooks")
+        if (!gitHooksDir.exists()) gitHooksDir.mkdirs()
+
+        val preCommitFile = File(gitHooksDir, "pre-commit")
+
+        // Nội dung script chặn commit
+        preCommitFile.writeText("""
+            #!/bin/bash
+            echo "Checking code format with Spotless..."
+            ./gradlew spotlessCheck
+            
+            if [ ${'$'}? -ne 0 ]; then
+                echo "❌ CODE FORMAT ERROR! Commit failed."
+                echo "💡 Please run: ./gradlew spotlessApply"
+                exit 1
+            fi
+        """.trimIndent())
+
+        preCommitFile.setExecutable(true)
+        println("✅ Pre-commit hook installed successfully!")
+    }
+}
+
+// Tự động chạy task tạo hook mỗi khi build
+tasks.named("build") { dependsOn("createPreCommitHook") }

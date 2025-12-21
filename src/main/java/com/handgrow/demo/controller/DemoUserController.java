@@ -2,7 +2,6 @@ package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.DemoUserCreationRequest;
 import com.handgrow.demo.dto.response.DemoUserResponse;
-import com.handgrow.demo.entity.DemoUser;
 import com.handgrow.demo.service.impl.DemoUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
