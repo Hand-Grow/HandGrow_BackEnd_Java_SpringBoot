@@ -1,4 +1,4 @@
-package com.handgrow.demo.service.impl;
+package com.handgrow.demo.service;
 
 import com.handgrow.demo.dto.request.DemoUserCreationRequest;
 import com.handgrow.demo.dto.response.DemoUserResponse;
