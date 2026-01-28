@@ -2,8 +2,6 @@ package com.handgrow.demo.dto.request;
 
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
 public class FarmerRegisterRequest {
     private String username;
@@ -11,5 +9,4 @@ public class FarmerRegisterRequest {
     private String fullName;
     private String phoneNumber;
     private String address;
-
 }

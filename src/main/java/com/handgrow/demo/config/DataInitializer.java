@@ -27,10 +27,10 @@ public class DataInitializer implements CommandLineRunner {
     private void createRoleIfNotExists(String name, String description) {
         if (roleRepository.findByName(name).isEmpty()) {
             Role role = Role.builder()
-                .name(name)
-                .description(description)
-                .isActive(true)
-                .build();
+                    .name(name)
+                    .description(description)
+                    .isActive(true)
+                    .build();
             roleRepository.save(role);
         }
     }

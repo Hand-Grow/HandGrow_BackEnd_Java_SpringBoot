@@ -24,21 +24,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable) // Because we use JWT, we can disable CSRF
-                .authorizeHttpRequests(
-                        auth -> auth.requestMatchers(
-                                "/api/auth/**", 
-                                "/api/v1/auth/**", 
-                                "/swagger-ui/**", 
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                                "/api/auth/**",
+                                "/api/v1/auth/**",
+                                "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**", 
+                                "/v3/api-docs/**",
                                 "/v3/api-docs",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/actuator/**"
-                        ).permitAll()
-                                .anyRequest()
-                                .authenticated()
-                        )
+                                "/actuator/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Not save token
                 .authenticationProvider(authenticationProvider)
