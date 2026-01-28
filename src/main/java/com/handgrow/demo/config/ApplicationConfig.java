@@ -26,8 +26,6 @@ public class ApplicationConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    // Tiện thể khai báo luôn AuthenticationProvider và PasswordEncoder ở đây cho gọn
-    // (Nếu bên SecurityConfig bạn đã khai báo rồi thì xóa bên đó đi, chuyển sang đây cho đúng chuẩn)
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

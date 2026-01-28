@@ -25,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable) // Because we use JWT, we can disable CSRF
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
+                        auth -> auth.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**","/actuator/**")
                                 .permitAll() // Alow these endpoints (swagger and auth)
                                 .anyRequest()
                                 .authenticated() // Need valid token for other requests
