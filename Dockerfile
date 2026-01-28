@@ -1,20 +1,53 @@
-# stage 1 create build file by gradle
-FROM gradle:jdk21-jammy AS builder
-WORKDIR /app
-COPY . .
+# Multi-stage build for HandGrow Backend
+# Stage 1: Build application
+FROM gradle:8.5-jdk21 AS builder
 
-RUN chmod +x ./gradlew
-# build source code
-RUN ./gradlew clean bootJar -x test
-
-# stage 2
-FROM openjdk:21-jdk-slim
 WORKDIR /app
-# copy build file from stage 1
+
+# Copy gradle files first for better caching
+COPY build.gradle.kts settings.gradle.kts ./
+COPY gradle/ gradle/
+COPY gradlew ./
+
+# Download dependencies
+RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
+
+# Copy source code
+COPY src/ src/
+
+# Build application
+RUN ./gradlew clean bootJar -x test --no-daemon
+
+# Stage 2: Runtime
+FROM eclipse-temurin:21-jre-alpine
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy JAR from builder stage
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# open 8080
+# Change ownership to non-root user
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+
+# Expose port
 EXPOSE 8080
 
-# Runnnnnnnnnnnnnnnnn
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# JVM optimization for containers
+ENTRYPOINT ["java", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-XX:+UseG1GC", \
+    "-XX:+UseStringDeduplication", \
+    "-Djava.security.egd=file:/dev/./urandom", \
+    "-jar", "app.jar"]
