@@ -3,8 +3,6 @@ package com.handgrow.demo.dto.request;
 import com.handgrow.demo.entity.enums.EnterpriseType;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
 public class EnterpriseRegisterRequest {
     private String username;
@@ -19,5 +17,4 @@ public class EnterpriseRegisterRequest {
     private String name;
     private String phoneNumber;
     private String representativeName;
-
 }
