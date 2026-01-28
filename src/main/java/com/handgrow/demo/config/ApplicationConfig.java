@@ -1,6 +1,6 @@
 package com.handgrow.demo.config;
 
-import com.handgrow.demo.repository.DemoUserRepository;
+import com.handgrow.demo.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    private final DemoUserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository
+        return username -> accountRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

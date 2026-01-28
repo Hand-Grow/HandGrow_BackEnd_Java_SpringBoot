@@ -17,7 +17,7 @@ spring:
   # 2. DATABASE CONFIGURATION
   # ===============================
   datasource:
-    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require
+    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
     username: postgres.lchqmvwbreujihzggwkj
     password: lapxuongnuongda
     driver-class-name: org.postgresql.Driver
@@ -31,15 +31,19 @@ spring:
   # 3. JPA CONFIGURATION
   # ===============================
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-#        format_sql: true
+        format_sql: true
 
-
+#  springdoc:
+#    api-docs:
+#      path: /v3/api-docs
+#    swagger-ui:
+#      path: /swagger-ui.html
 # ===============================
 # 4. CUSTOM JWT CONFIGURATION
 # ===============================
