@@ -1,6 +1,6 @@
 package com.handgrow.demo.config;
 
-import com.handgrow.demo.repository.DemoUserRepository;
+import com.handgrow.demo.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,17 +17,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    private final DemoUserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository
+        return username -> accountRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    // Tiện thể khai báo luôn AuthenticationProvider và PasswordEncoder ở đây cho gọn
-    // (Nếu bên SecurityConfig bạn đã khai báo rồi thì xóa bên đó đi, chuyển sang đây cho đúng chuẩn)
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

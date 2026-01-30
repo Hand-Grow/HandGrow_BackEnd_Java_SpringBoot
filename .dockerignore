@@ -1,0 +1,42 @@
+# Build artifacts
+build/
+.gradle/
+*.jar
+*.war
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+docs/
+
+# CI/CD
+.github/
+Dockerfile
+.dockerignore
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
+.env.example
+
+# Temporary files
+tmp/
+temp/

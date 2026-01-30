@@ -3,6 +3,7 @@ plugins {
 	id("org.springframework.boot") version "3.5.9"
 	id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "6.25.0"
+	id("jacoco")
 }
 
 group = "com.handgrow"
@@ -30,15 +31,13 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("io.github.cdimascio:java-dotenv:5.2.2")
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
@@ -46,7 +45,14 @@ dependencies {
     // Redis cache
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     // OpenApi
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
+	// Junit + Mockito
+	testImplementation ("org.springframework.boot:spring-boot-starter-test")
+	testImplementation ("org.mockito:mockito-core")
+	testImplementation ("org.mockito:mockito-junit-jupiter")
+	// Test dependency
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {
@@ -91,3 +97,19 @@ tasks.register("createPreCommitHook") {
 
 // Tự động chạy task tạo hook mỗi khi build
 tasks.named("build") { dependsOn("createPreCommitHook") }
+
+
+tasks.test {
+	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
