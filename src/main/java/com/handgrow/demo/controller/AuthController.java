@@ -19,11 +19,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
-    }
-
     @PostMapping("/register/farmer")
     public ResponseEntity<AuthResponse> registerFarmer(@RequestBody FarmerRegisterRequest request) {
         return ResponseEntity.ok(authService.registerFarmer(request));

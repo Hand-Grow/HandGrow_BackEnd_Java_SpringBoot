@@ -27,6 +27,12 @@ public class Account extends BaseEntity implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expiry")
+    private java.time.LocalDateTime refreshTokenExpiry;
+
     @Column(name = "is_active")
     @Builder.Default
     private boolean isActive = true;

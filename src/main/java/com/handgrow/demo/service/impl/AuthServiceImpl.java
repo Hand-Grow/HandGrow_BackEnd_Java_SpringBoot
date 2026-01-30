@@ -2,7 +2,6 @@ package com.handgrow.demo.service.impl;
 
 import com.handgrow.demo.dto.request.*;
 import com.handgrow.demo.dto.response.AuthResponse;
-import com.handgrow.demo.dto.response.UserResponse;
 import com.handgrow.demo.entity.*;
 import com.handgrow.demo.repository.*;
 import com.handgrow.demo.service.AuthService;
@@ -29,29 +28,26 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid username or password");
+        }
 
         Account account = accountRepository
                 .findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String accessToken = jwtUtil.generateToken(account.getUsername());
-
-        UserResponse userResponse = buildUserResponse(account);
+        String accessToken =
+                jwtUtil.generateToken(account.getUsername(), account.getRole().getName());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken("refresh_token_placeholder")
                 .tokenType("Bearer")
                 .expiresIn(86400000L)
-                .user(userResponse)
                 .build();
-    }
-
-    @Override
-    public AuthResponse register(RegisterRequest request) {
-        throw new RuntimeException("Use specific role registration endpoints");
     }
 
     @Override
@@ -78,22 +74,13 @@ public class AuthServiceImpl implements AuthService {
 
         farmerRepository.save(farmer);
 
-        String accessToken = jwtUtil.generateToken(account.getUsername());
-
-        UserResponse userResponse = UserResponse.builder()
-                .id(farmer.getId().toString())
-                .fullName(farmer.getFullName())
-                .phoneNumber(farmer.getPhoneNumber())
-                .role(role.getName())
-                .avatarUrl(farmer.getAvatarUrl())
-                .build();
+        String accessToken = jwtUtil.generateToken(account.getUsername(), role.getName());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken("refresh_token_placeholder")
                 .tokenType("Bearer")
                 .expiresIn(86400000L)
-                .user(userResponse)
                 .build();
     }
 
@@ -121,22 +108,13 @@ public class AuthServiceImpl implements AuthService {
 
         cooperativeRepository.save(coop);
 
-        String accessToken = jwtUtil.generateToken(account.getUsername());
-
-        UserResponse userResponse = UserResponse.builder()
-                .id(coop.getId().toString())
-                .fullName(coop.getName())
-                .phoneNumber(null)
-                .role(role.getName())
-                .avatarUrl(null)
-                .build();
+        String accessToken = jwtUtil.generateToken(account.getUsername(), role.getName());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken("refresh_token_placeholder")
                 .tokenType("Bearer")
                 .expiresIn(86400000L)
-                .user(userResponse)
                 .build();
     }
 
@@ -171,63 +149,13 @@ public class AuthServiceImpl implements AuthService {
 
         enterpriseRepository.save(enterprise);
 
-        String accessToken = jwtUtil.generateToken(account.getUsername());
-
-        UserResponse userResponse = UserResponse.builder()
-                .id(enterprise.getId().toString())
-                .fullName(enterprise.getCompanyName())
-                .phoneNumber(enterprise.getPhoneNumber())
-                .role(role.getName())
-                .avatarUrl(null)
-                .build();
+        String accessToken = jwtUtil.generateToken(account.getUsername(), role.getName());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken("refresh_token_placeholder")
                 .tokenType("Bearer")
                 .expiresIn(86400000L)
-                .user(userResponse)
                 .build();
-    }
-
-    private UserResponse buildUserResponse(Account account) {
-        String roleName = account.getRole().getName();
-        switch (roleName) {
-            case "FARMER":
-                Farmer farmer = farmerRepository
-                        .findByAccount(account)
-                        .orElseThrow(() -> new RuntimeException("Farmer not found"));
-                return UserResponse.builder()
-                        .id(farmer.getId().toString())
-                        .fullName(farmer.getFullName())
-                        .phoneNumber(farmer.getPhoneNumber())
-                        .role("FARMER")
-                        .avatarUrl(farmer.getAvatarUrl())
-                        .build();
-            case "COOP":
-                Cooperative coop = cooperativeRepository
-                        .findByAccount(account)
-                        .orElseThrow(() -> new RuntimeException("Cooperative not found"));
-                return UserResponse.builder()
-                        .id(coop.getId().toString())
-                        .fullName(coop.getName())
-                        .phoneNumber(null)
-                        .role("COOP")
-                        .avatarUrl(null)
-                        .build();
-            case "ENTERPRISE":
-                Enterprise enterprise = enterpriseRepository
-                        .findByAccount(account)
-                        .orElseThrow(() -> new RuntimeException("Enterprise not found"));
-                return UserResponse.builder()
-                        .id(enterprise.getId().toString())
-                        .fullName(enterprise.getCompanyName())
-                        .phoneNumber(enterprise.getPhoneNumber())
-                        .role("ENTERPRISE")
-                        .avatarUrl(null)
-                        .build();
-            default:
-                throw new RuntimeException("Unknown user role");
-        }
     }
 }
