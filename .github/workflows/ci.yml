@@ -19,7 +19,11 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build -x test
-
+        env:
+          DB_URL: jdbc:h2:mem:testdb
+          DB_USERNAME: sa
+          DB_PASSWORD: 
+          JWT_SECRET_KEY: test-secret-key-for-ci
 
   deploy_to_render:
     needs: build_and_test
