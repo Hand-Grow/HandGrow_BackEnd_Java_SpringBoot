@@ -32,6 +32,11 @@ Dockerfile
 logs/
 *.log
 
+# Environment files
+.env
+.env.local
+.env.example
+
 # Temporary files
 tmp/
 temp/
