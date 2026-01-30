@@ -1,8 +1,7 @@
 spring:
   application:
     name: ${APP_NAME:handgrow-backend}
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+
 
 # ===============================
 # DEBUG CONFIGURATION  
