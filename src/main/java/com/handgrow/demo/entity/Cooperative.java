@@ -1,5 +1,6 @@
 package com.handgrow.demo.entity;
 
+import com.handgrow.demo.entity.enums.Produce;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,8 +22,21 @@ public class Cooperative extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(name = "phone_number", length = 15)
+    private String phoneNumber;
+
     @Column(columnDefinition = "TEXT")
     private String address;
+
+    @Column(name = "commune")
+    private String commune;
+
+    @Column(name = "province")
+    private String province;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "produce")
+    private Produce produce;
 
     @Column(name = "representative_name")
     private String representativeName;
