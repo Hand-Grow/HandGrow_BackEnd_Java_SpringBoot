@@ -1,6 +1,5 @@
 package com.handgrow.demo.entity;
 
-import com.handgrow.demo.entity.enums.EnterpriseType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,12 +19,21 @@ public class Enterprise extends BaseEntity {
     @Column(name = "company_name", nullable = false, length = 150)
     private String companyName;
 
-    @Column(name = "tax_code", nullable = false, length = 20, unique = true)
-    private String taxCode;
+    @Column(name = "phone_number", length = 15)
+    private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "business_type", nullable = false)
-    private EnterpriseType businessType;
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
+    @Column(name = "commune")
+    private String commune;
+
+    @Column(name = "province")
+    private String province;
+
+    // Keep other fields for existing data
+    @Column(name = "tax_code", length = 20)
+    private String taxCode;
 
     @Column(name = "contact_email", length = 100)
     private String contactEmail;
@@ -33,18 +41,8 @@ public class Enterprise extends BaseEntity {
     @Column(name = "website_url", length = 255)
     private String websiteUrl;
 
-    @Column(columnDefinition = "TEXT")
-    private String address;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "enterprise_type", nullable = false)
-    private EnterpriseType enterpriseType;
-
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String name;
-
-    @Column(name = "phone_number", length = 15)
-    private String phoneNumber;
 
     @Column(name = "representative_name")
     private String representativeName;

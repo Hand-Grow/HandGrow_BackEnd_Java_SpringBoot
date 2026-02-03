@@ -1,5 +1,6 @@
 package com.handgrow.demo.entity;
 
+import com.handgrow.demo.entity.enums.Produce;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,6 +29,16 @@ public class Farmer extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String address;
+
+    @Column(name = "commune")
+    private String commune;
+
+    @Column(name = "province")
+    private String province;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "produce")
+    private Produce produce;
 
     @Column(name = "voice_profile_data", columnDefinition = "TEXT")
     private String voiceProfileData;

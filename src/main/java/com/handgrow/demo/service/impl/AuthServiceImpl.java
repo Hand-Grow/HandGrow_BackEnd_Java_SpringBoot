@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
                 .account(account)
                 .fullName(request.getFullName())
                 .phoneNumber(request.getPhoneNumber())
-                .address(request.getAddress())
+                .produce(request.getProduce())
                 .build();
 
         farmerRepository.save(farmer);
@@ -102,8 +102,10 @@ public class AuthServiceImpl implements AuthService {
         Cooperative coop = Cooperative.builder()
                 .account(account)
                 .name(request.getName())
-                .address(request.getAddress())
-                .representativeName(request.getRepresentativeName())
+                .phoneNumber(request.getPhoneNumber())
+                .commune(request.getCommune())
+                .province(request.getProvince())
+                .produce(request.getProduce())
                 .build();
 
         cooperativeRepository.save(coop);
@@ -136,15 +138,9 @@ public class AuthServiceImpl implements AuthService {
         Enterprise enterprise = Enterprise.builder()
                 .account(account)
                 .companyName(request.getCompanyName())
-                .taxCode(request.getTaxCode())
-                .businessType(request.getBusinessType())
-                .contactEmail(request.getContactEmail())
-                .websiteUrl(request.getWebsiteUrl())
-                .address(request.getAddress())
-                .enterpriseType(request.getEnterpriseType())
-                .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
-                .representativeName(request.getRepresentativeName())
+                .commune(request.getCommune())
+                .province(request.getProvince())
                 .build();
 
         enterpriseRepository.save(enterprise);
