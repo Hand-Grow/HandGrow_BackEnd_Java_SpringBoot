@@ -1,11 +1,14 @@
 package com.handgrow.demo.service.impl;
 
+import com.handgrow.demo.dto.request.FarmerLocationUpdateDto;
+import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.dto.response.UserResponse;
 import com.handgrow.demo.entity.*;
 import com.handgrow.demo.repository.*;
 import com.handgrow.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -85,6 +88,31 @@ public class UserServiceImpl implements UserService {
                 .address(enterprise.getAddress())
                 .commune(enterprise.getCommune())
                 .province(enterprise.getProvince())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public SimpleResponse updateFarmerLocation(String username, FarmerLocationUpdateDto locationDto) {
+        Account account =
+                accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!"FARMER".equals(account.getRole().getName())) {
+            throw new RuntimeException("Only farmers can update location");
+        }
+
+        Farmer farmer = farmerRepository
+                .findByAccount(account)
+                .orElseThrow(() -> new RuntimeException("Farmer profile not found"));
+
+        farmer.setCommune(locationDto.getCommune());
+        farmer.setProvince(locationDto.getProvince());
+
+        farmerRepository.save(farmer);
+
+        return SimpleResponse.builder()
+                .success(true)
+                .message("Location updated successfully")
                 .build();
     }
 }
