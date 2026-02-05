@@ -3,6 +3,7 @@ package com.handgrow.demo.controller;
 import com.handgrow.demo.dto.request.JoinRequestDto;
 import com.handgrow.demo.dto.request.JoinRequestResponseDto;
 import com.handgrow.demo.dto.response.JoinRequestResponse;
+import com.handgrow.demo.entity.enums.JoinRequestStatus;
 import com.handgrow.demo.service.JoinRequestService;
 import java.util.List;
 import java.util.UUID;
@@ -35,14 +36,6 @@ public class JoinRequestController {
         return ResponseEntity.ok(requests);
     }
 
-    // Cooperative xem các pending requests
-    @GetMapping("/pending")
-    public ResponseEntity<List<JoinRequestResponse>> getPendingRequests(Authentication authentication) {
-        String username = authentication.getName();
-        List<JoinRequestResponse> requests = joinRequestService.getPendingRequests(username);
-        return ResponseEntity.ok(requests);
-    }
-
     // Cooperative approve/reject request
     @PutMapping("/{requestId}/respond")
     public ResponseEntity<JoinRequestResponse> respondToRequest(
@@ -50,5 +43,23 @@ public class JoinRequestController {
         String username = authentication.getName();
         JoinRequestResponse result = joinRequestService.respondToRequest(username, requestId, response);
         return ResponseEntity.ok(result);
+    }
+
+    // Cooperative xem requests theo status
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<JoinRequestResponse>> getRequestsByStatus(
+            Authentication authentication, @PathVariable JoinRequestStatus status) {
+        String username = authentication.getName();
+        List<JoinRequestResponse> requests = joinRequestService.getRequestsByStatus(username, status);
+        return ResponseEntity.ok(requests);
+    }
+
+    // Farmer xem requests theo status
+    @GetMapping("/my-requests/status/{status}")
+    public ResponseEntity<List<JoinRequestResponse>> getFarmerRequestsByStatus(
+            Authentication authentication, @PathVariable JoinRequestStatus status) {
+        String username = authentication.getName();
+        List<JoinRequestResponse> requests = joinRequestService.getFarmerRequestsByStatus(username, status);
+        return ResponseEntity.ok(requests);
     }
 }
