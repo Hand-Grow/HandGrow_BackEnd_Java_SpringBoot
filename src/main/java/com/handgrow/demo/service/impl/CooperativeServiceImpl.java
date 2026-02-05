@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class CooperativeServiceImpl implements CooperativeService {
     private final CooperativeRepository cooperativeRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CooperativeResponse> searchCooperatives(CooperativeSearchDto searchDto) {
         List<Cooperative> cooperatives;
 
@@ -47,6 +49,7 @@ public class CooperativeServiceImpl implements CooperativeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CooperativeResponse> getAllCooperatives() {
         List<Cooperative> cooperatives = cooperativeRepository.findAllOrderByMemberCount();
         return cooperatives.stream().map(this::buildCooperativeResponse).collect(Collectors.toList());
