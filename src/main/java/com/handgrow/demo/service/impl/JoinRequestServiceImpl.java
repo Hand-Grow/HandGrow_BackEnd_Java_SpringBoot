@@ -61,22 +61,6 @@ public class JoinRequestServiceImpl implements JoinRequestService {
     }
 
     @Override
-    public List<JoinRequestResponse> getPendingRequests(String coopUsername) {
-        Account coopAccount = accountRepository
-                .findByUsername(coopUsername)
-                .orElseThrow(() -> new RuntimeException("Cooperative not found"));
-
-        Cooperative cooperative = cooperativeRepository
-                .findByAccount(coopAccount)
-                .orElseThrow(() -> new RuntimeException("Cooperative profile not found"));
-
-        List<JoinRequest> pendingRequests =
-                joinRequestRepository.findByCooperativeAndStatus(cooperative, JoinRequestStatus.PENDING);
-
-        return pendingRequests.stream().map(this::buildJoinRequestResponse).collect(Collectors.toList());
-    }
-
-    @Override
     @Transactional
     public JoinRequestResponse respondToRequest(String coopUsername, UUID requestId, JoinRequestResponseDto response) {
         Account coopAccount = accountRepository
@@ -141,5 +125,35 @@ public class JoinRequestServiceImpl implements JoinRequestService {
                 .responseMessage(joinRequest.getResponseMessage())
                 .createdAt(joinRequest.getCreatedAt().toString())
                 .build();
+    }
+
+    @Override
+    public List<JoinRequestResponse> getRequestsByStatus(String coopUsername, JoinRequestStatus status) {
+        Account coopAccount = accountRepository
+                .findByUsername(coopUsername)
+                .orElseThrow(() -> new RuntimeException("Cooperative not found"));
+
+        Cooperative cooperative = cooperativeRepository
+                .findByAccount(coopAccount)
+                .orElseThrow(() -> new RuntimeException("Cooperative profile not found"));
+
+        List<JoinRequest> requests = joinRequestRepository.findByCooperativeAndStatus(cooperative, status);
+
+        return requests.stream().map(this::buildJoinRequestResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<JoinRequestResponse> getFarmerRequestsByStatus(String farmerUsername, JoinRequestStatus status) {
+        Account farmerAccount = accountRepository
+                .findByUsername(farmerUsername)
+                .orElseThrow(() -> new RuntimeException("Farmer not found"));
+
+        Farmer farmer = farmerRepository
+                .findByAccount(farmerAccount)
+                .orElseThrow(() -> new RuntimeException("Farmer profile not found"));
+
+        List<JoinRequest> requests = joinRequestRepository.findByFarmerAndStatus(farmer, status);
+
+        return requests.stream().map(this::buildJoinRequestResponse).collect(Collectors.toList());
     }
 }
