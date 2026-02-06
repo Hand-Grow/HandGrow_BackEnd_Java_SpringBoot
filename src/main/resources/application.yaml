@@ -23,12 +23,12 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:password}
     driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
-    hikari:
-      minimum-idle: 2
-      maximum-pool-size: 10
-      idle-timeout: 30000
-      connection-timeout: 30000
-      max-lifetime: 600000
+#    hikari:
+#      minimum-idle: 2
+#      maximum-pool-size: 10
+#      idle-timeout: 30000
+#      connection-timeout: 30000
+#      max-lifetime: 600000
 
   # ===============================
   # 3. JPA CONFIGURATION
