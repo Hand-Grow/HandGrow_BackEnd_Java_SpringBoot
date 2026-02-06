@@ -101,6 +101,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<JoinRequestResponse> getFarmerRequests(String farmerUsername) {
         Account farmerAccount = accountRepository
                 .findByUsername(farmerUsername)
@@ -128,6 +129,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<JoinRequestResponse> getRequestsByStatus(String coopUsername, JoinRequestStatus status) {
         Account coopAccount = accountRepository
                 .findByUsername(coopUsername)
@@ -143,6 +145,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<JoinRequestResponse> getFarmerRequestsByStatus(String farmerUsername, JoinRequestStatus status) {
         Account farmerAccount = accountRepository
                 .findByUsername(farmerUsername)
@@ -153,6 +156,22 @@ public class JoinRequestServiceImpl implements JoinRequestService {
                 .orElseThrow(() -> new RuntimeException("Farmer profile not found"));
 
         List<JoinRequest> requests = joinRequestRepository.findByFarmerAndStatus(farmer, status);
+
+        return requests.stream().map(this::buildJoinRequestResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<JoinRequestResponse> getAllRequests(String coopUsername) {
+        Account coopAccount = accountRepository
+                .findByUsername(coopUsername)
+                .orElseThrow(() -> new RuntimeException("Cooperative not found"));
+
+        Cooperative cooperative = cooperativeRepository
+                .findByAccount(coopAccount)
+                .orElseThrow(() -> new RuntimeException("Cooperative profile not found"));
+
+        List<JoinRequest> requests = joinRequestRepository.findByCooperative(cooperative);
 
         return requests.stream().map(this::buildJoinRequestResponse).collect(Collectors.toList());
     }

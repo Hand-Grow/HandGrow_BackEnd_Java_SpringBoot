@@ -62,4 +62,12 @@ public class JoinRequestController {
         List<JoinRequestResponse> requests = joinRequestService.getFarmerRequestsByStatus(username, status);
         return ResponseEntity.ok(requests);
     }
+
+    // Cooperative xem tất cả requests (không phân biệt status)
+    @GetMapping("/all")
+    public ResponseEntity<List<JoinRequestResponse>> getAllRequests(Authentication authentication) {
+        String username = authentication.getName();
+        List<JoinRequestResponse> requests = joinRequestService.getAllRequests(username);
+        return ResponseEntity.ok(requests);
+    }
 }
