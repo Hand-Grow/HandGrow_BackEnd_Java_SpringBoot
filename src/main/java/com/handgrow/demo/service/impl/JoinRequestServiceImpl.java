@@ -101,6 +101,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<JoinRequestResponse> getFarmerRequests(String farmerUsername) {
         Account farmerAccount = accountRepository
                 .findByUsername(farmerUsername)
@@ -128,6 +129,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<JoinRequestResponse> getRequestsByStatus(String coopUsername, JoinRequestStatus status) {
         Account coopAccount = accountRepository
                 .findByUsername(coopUsername)
@@ -143,6 +145,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<JoinRequestResponse> getFarmerRequestsByStatus(String farmerUsername, JoinRequestStatus status) {
         Account farmerAccount = accountRepository
                 .findByUsername(farmerUsername)
