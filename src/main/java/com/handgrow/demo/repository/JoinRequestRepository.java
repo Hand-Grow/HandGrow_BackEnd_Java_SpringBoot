@@ -15,6 +15,8 @@ public interface JoinRequestRepository extends JpaRepository<JoinRequest, UUID> 
 
     List<JoinRequest> findByCooperativeAndStatus(Cooperative cooperative, JoinRequestStatus status);
 
+    List<JoinRequest> findByCooperative(Cooperative cooperative);
+
     List<JoinRequest> findByFarmerAndStatus(Farmer farmer, JoinRequestStatus status);
 
     Optional<JoinRequest> findByFarmerAndCooperativeAndStatus(

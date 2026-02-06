@@ -159,4 +159,20 @@ public class JoinRequestServiceImpl implements JoinRequestService {
 
         return requests.stream().map(this::buildJoinRequestResponse).collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<JoinRequestResponse> getAllRequests(String coopUsername) {
+        Account coopAccount = accountRepository
+                .findByUsername(coopUsername)
+                .orElseThrow(() -> new RuntimeException("Cooperative not found"));
+
+        Cooperative cooperative = cooperativeRepository
+                .findByAccount(coopAccount)
+                .orElseThrow(() -> new RuntimeException("Cooperative profile not found"));
+
+        List<JoinRequest> requests = joinRequestRepository.findByCooperative(cooperative);
+
+        return requests.stream().map(this::buildJoinRequestResponse).collect(Collectors.toList());
+    }
 }

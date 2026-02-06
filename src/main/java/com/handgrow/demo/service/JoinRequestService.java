@@ -13,6 +13,8 @@ public interface JoinRequestService {
 
     List<JoinRequestResponse> getRequestsByStatus(String coopUsername, JoinRequestStatus status);
 
+    List<JoinRequestResponse> getAllRequests(String coopUsername);
+
     JoinRequestResponse respondToRequest(String coopUsername, UUID requestId, JoinRequestResponseDto response);
 
     List<JoinRequestResponse> getFarmerRequests(String farmerUsername);
