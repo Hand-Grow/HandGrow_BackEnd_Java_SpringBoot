@@ -19,7 +19,7 @@ spring:
   # 2. DATABASE CONFIGURATION
   # ===============================
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/handgrow_db}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/handgrow_db?prepareThreshold=0}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:password}
     driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
@@ -37,7 +37,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      ddl-auto: ${JPA_DDL_AUTO:none}
     show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:
@@ -75,3 +75,7 @@ management:
   health:
     redis:
       enabled: false
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}

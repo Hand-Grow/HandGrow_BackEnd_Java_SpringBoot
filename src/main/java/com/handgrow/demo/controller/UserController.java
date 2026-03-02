@@ -1,5 +1,7 @@
 package com.handgrow.demo.controller;
 
+import com.handgrow.demo.dto.request.FarmerLocationUpdateDto;
+import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.dto.response.UserResponse;
 import com.handgrow.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +21,13 @@ public class UserController {
         String username = authentication.getName();
         UserResponse userResponse = userService.getUserProfile(username);
         return ResponseEntity.ok(userResponse);
+    }
+
+    @PutMapping("/location")
+    public ResponseEntity<SimpleResponse> updateFarmerLocation(
+            Authentication authentication, @RequestBody FarmerLocationUpdateDto locationDto) {
+        String username = authentication.getName();
+        SimpleResponse response = userService.updateFarmerLocation(username, locationDto);
+        return ResponseEntity.ok(response);
     }
 }
