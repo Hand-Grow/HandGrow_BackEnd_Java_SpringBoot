@@ -19,7 +19,7 @@ spring:
   # 2. DATABASE CONFIGURATION
   # ===============================
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/handgrow_db}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/handgrow_db?prepareThreshold=0}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:password}
     driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
@@ -78,4 +78,4 @@ management:
 
 gemini:
   api:
-    key: ${GEMINI_API_KEY:AIzaSyBSnwCSUb52hHiAaxK083hKy1_txWB71ug}
+    key: ${GEMINI_API_KEY}
