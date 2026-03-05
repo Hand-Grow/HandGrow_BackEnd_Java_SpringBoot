@@ -1,6 +1,8 @@
 package com.handgrow.demo.entity;
 
+import com.handgrow.demo.util.StringListConverter;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 
 @Entity
@@ -23,5 +25,6 @@ public class CoopAnnouncement extends BaseEntity {
     private String content;
 
     @Column(name = "attachments", columnDefinition = "jsonb")
-    private String attachments;
+    @Convert(converter = StringListConverter.class)
+    private List<String> attachments; // Array of image URLs
 }

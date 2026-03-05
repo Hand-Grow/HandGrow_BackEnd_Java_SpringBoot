@@ -40,7 +40,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .cooperative(coop)
                 .title(request.getTitle())
                 .content(request.getContent())
-                .attachments(request.getAttachments())
+                .attachments(request.getAttachments()) // Nullable - can be null or mock URLs
                 .build());
 
         return new SimpleResponse("Đã tạo thông báo", true);
