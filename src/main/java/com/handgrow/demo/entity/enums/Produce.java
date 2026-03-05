@@ -6,7 +6,7 @@ public enum Produce {
     VEGETABLES, // Rau củ
     FRUITS, // Trái cây
     COFFEE, // Cà phê
-    TEA, // Chá
+    TEA, // Trà
     RUBBER, // Cao su
     SUGARCANE, // Mía
     CASSAVA, // Sắn
