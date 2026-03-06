@@ -40,8 +40,8 @@ public class CampaignController {
     @PostMapping("/campaigns/{id}/commitments")
     public ResponseEntity<SimpleResponse> addCommitment(
             @PathVariable UUID id, @RequestBody CreateCommitmentRequest request, Principal principal) {
-        UUID farmerId = UUID.fromString(principal.getName());
-        return ResponseEntity.ok(campaignService.addCommitment(id, farmerId, request));
+        String username = principal.getName();
+        return ResponseEntity.ok(campaignService.addCommitment(id, username, request));
     }
 
     @GetMapping("/campaigns/{id}/commitments")

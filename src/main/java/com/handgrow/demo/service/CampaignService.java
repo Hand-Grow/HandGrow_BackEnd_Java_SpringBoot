@@ -14,7 +14,7 @@ public interface CampaignService {
 
     SimpleResponse createCampaign(UUID coopId, CreateCampaignRequest request);
 
-    SimpleResponse addCommitment(UUID campaignId, UUID farmerId, CreateCommitmentRequest request);
+    SimpleResponse addCommitment(UUID campaignId, String username, CreateCommitmentRequest request);
 
     List<CommitmentResponse> getCommitments(UUID campaignId, Pageable pageable);
 
