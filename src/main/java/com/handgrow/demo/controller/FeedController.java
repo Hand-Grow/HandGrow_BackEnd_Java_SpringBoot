@@ -6,6 +6,8 @@ import com.handgrow.demo.dto.response.FeedItemResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.entity.enums.FeedTargetType;
 import com.handgrow.demo.service.FeedService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -22,9 +24,16 @@ public class FeedController {
     private final FeedService feedService;
 
     @GetMapping("/coops/{coopId}/feed")
+    @Operation(summary = "Get newsfeed", description = "Get announcements and campaigns feed")
+    @Parameter(name = "page", description = "Page number (starts from 0)", example = "0")
+    @Parameter(name = "size", description = "Page size", example = "10")
+    @Parameter(name = "sort", description = "Sort by field,direction (e.g. createdAt,desc)", example = "createdAt,desc")
     public ResponseEntity<List<FeedItemResponse>> getFeed(
-            @PathVariable UUID coopId, Principal principal, Pageable pageable) {
-        return ResponseEntity.ok(feedService.getFeed(coopId, principal.getName(), pageable));
+            @PathVariable UUID coopId,
+            @RequestParam(required = false) FeedTargetType type,
+            Principal principal,
+            Pageable pageable) {
+        return ResponseEntity.ok(feedService.getFeed(coopId, type, principal.getName(), pageable));
     }
 
     @PostMapping("/feed/{type}/{id}/likes")

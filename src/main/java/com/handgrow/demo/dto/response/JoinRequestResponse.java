@@ -14,6 +14,7 @@ public class JoinRequestResponse {
     private String farmerName;
     private String farmerPhone;
     private String cooperativeName;
+    private String cooperativeId;
     private String status;
     private String responseMessage;
     private String createdAt;

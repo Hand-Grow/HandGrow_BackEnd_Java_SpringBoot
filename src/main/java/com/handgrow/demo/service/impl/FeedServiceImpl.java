@@ -28,46 +28,54 @@ public class FeedServiceImpl implements FeedService {
     private final FarmerRepository farmerRepository;
 
     @Transactional
-    public List<FeedItemResponse> getFeed(UUID coopId, String username, Pageable pageable) {
-        Farmer farmer =
-                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
-        UUID farmerId = farmer.getId();
+    public List<FeedItemResponse> getFeed(UUID coopId, FeedTargetType type, String username, Pageable pageable) {
+        UUID farmerId =
+                farmerRepository.findByUsername(username).map(Farmer::getId).orElse(null);
 
         List<FeedItemResponse> feed = new ArrayList<>();
 
-        List<CoopAnnouncement> announcements =
-                announcementRepository.findByCooperativeIdOrderByCreatedAtDesc(coopId, pageable);
-        for (CoopAnnouncement a : announcements) {
-            feed.add(FeedItemResponse.builder()
-                    .id(a.getId())
-                    .type(FeedTargetType.ANNOUNCEMENT)
-                    .title(a.getTitle())
-                    .content(a.getContent())
-                    .likeCount(likeRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
-                    .commentCount(
-                            commentRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
-                    .isLiked(likeRepository
-                            .findByFarmerIdAndTargetIdAndTargetType(farmerId, a.getId(), FeedTargetType.ANNOUNCEMENT)
-                            .isPresent())
-                    .createdAt(a.getCreatedAt())
-                    .build());
+        if (type == null || type == FeedTargetType.ANNOUNCEMENT) {
+            List<CoopAnnouncement> announcements =
+                    announcementRepository.findByCooperativeIdOrderByCreatedAtDesc(coopId, pageable);
+            for (CoopAnnouncement a : announcements) {
+                feed.add(FeedItemResponse.builder()
+                        .id(a.getId())
+                        .type(FeedTargetType.ANNOUNCEMENT)
+                        .title(a.getTitle())
+                        .content(a.getContent())
+                        .likeCount(likeRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
+                        .commentCount(
+                                commentRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
+                        .isLiked(farmerId != null
+                                && likeRepository
+                                        .findByFarmerIdAndTargetIdAndTargetType(
+                                                farmerId, a.getId(), FeedTargetType.ANNOUNCEMENT)
+                                        .isPresent())
+                        .createdAt(a.getCreatedAt())
+                        .build());
+            }
         }
 
-        List<CollectionCampaign> campaigns =
-                campaignRepository.findByCooperativeIdOrderByCreatedAtDesc(coopId, pageable);
-        for (CollectionCampaign c : campaigns) {
-            feed.add(FeedItemResponse.builder()
-                    .id(c.getId())
-                    .type(FeedTargetType.CAMPAIGN)
-                    .title(c.getProductName())
-                    .content("Ngày dự kiến: " + c.getExpectedDate())
-                    .likeCount(likeRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
-                    .commentCount(commentRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
-                    .isLiked(likeRepository
-                            .findByFarmerIdAndTargetIdAndTargetType(farmerId, c.getId(), FeedTargetType.CAMPAIGN)
-                            .isPresent())
-                    .createdAt(c.getCreatedAt())
-                    .build());
+        if (type == null || type == FeedTargetType.CAMPAIGN) {
+            List<CollectionCampaign> campaigns =
+                    campaignRepository.findByCooperativeIdOrderByCreatedAtDesc(coopId, pageable);
+            for (CollectionCampaign c : campaigns) {
+                feed.add(FeedItemResponse.builder()
+                        .id(c.getId())
+                        .type(FeedTargetType.CAMPAIGN)
+                        .title(c.getProductName())
+                        .content("Ngày dự kiến: " + c.getExpectedDate())
+                        .likeCount(likeRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
+                        .commentCount(
+                                commentRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
+                        .isLiked(farmerId != null
+                                && likeRepository
+                                        .findByFarmerIdAndTargetIdAndTargetType(
+                                                farmerId, c.getId(), FeedTargetType.CAMPAIGN)
+                                        .isPresent())
+                        .createdAt(c.getCreatedAt())
+                        .build());
+            }
         }
 
         return feed.stream()
