@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
 public interface FeedService {
-    List<FeedItemResponse> getFeed(UUID coopId, String username, Pageable pageable);
+    List<FeedItemResponse> getFeed(UUID coopId, FeedTargetType type, String username, Pageable pageable);
 
     void toggleLike(String username, UUID targetId, FeedTargetType type);
 
