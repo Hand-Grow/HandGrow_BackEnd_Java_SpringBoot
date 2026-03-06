@@ -9,11 +9,11 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
 public interface FeedService {
-    List<FeedItemResponse> getFeed(UUID coopId, UUID farmerId, Pageable pageable);
+    List<FeedItemResponse> getFeed(UUID coopId, String username, Pageable pageable);
 
-    void toggleLike(UUID farmerId, UUID targetId, FeedTargetType type);
+    void toggleLike(String username, UUID targetId, FeedTargetType type);
 
     List<CommentResponse> getComments(UUID targetId, FeedTargetType type, Pageable pageable);
 
-    CommentResponse addComment(UUID farmerId, UUID targetId, FeedTargetType type, CreateCommentRequest request);
+    CommentResponse addComment(String username, UUID targetId, FeedTargetType type, CreateCommentRequest request);
 }

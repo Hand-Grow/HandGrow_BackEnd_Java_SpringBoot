@@ -24,15 +24,13 @@ public class FeedController {
     @GetMapping("/coops/{coopId}/feed")
     public ResponseEntity<List<FeedItemResponse>> getFeed(
             @PathVariable UUID coopId, Principal principal, Pageable pageable) {
-        UUID farmerId = UUID.fromString(principal.getName());
-        return ResponseEntity.ok(feedService.getFeed(coopId, farmerId, pageable));
+        return ResponseEntity.ok(feedService.getFeed(coopId, principal.getName(), pageable));
     }
 
     @PostMapping("/feed/{type}/{id}/likes")
     public ResponseEntity<SimpleResponse> toggleLike(
             @PathVariable String type, @PathVariable UUID id, Principal principal) {
-        UUID farmerId = UUID.fromString(principal.getName());
-        feedService.toggleLike(farmerId, id, FeedTargetType.valueOf(type.toUpperCase()));
+        feedService.toggleLike(principal.getName(), id, FeedTargetType.valueOf(type.toUpperCase()));
         return ResponseEntity.ok(new SimpleResponse("Đã thả tim", true));
     }
 
@@ -48,8 +46,7 @@ public class FeedController {
             @PathVariable UUID id,
             @RequestBody CreateCommentRequest request,
             Principal principal) {
-        UUID farmerId = UUID.fromString(principal.getName());
         return ResponseEntity.ok(
-                feedService.addComment(farmerId, id, FeedTargetType.valueOf(type.toUpperCase()), request));
+                feedService.addComment(principal.getName(), id, FeedTargetType.valueOf(type.toUpperCase()), request));
     }
 }
