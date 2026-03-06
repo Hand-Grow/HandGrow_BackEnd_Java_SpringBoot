@@ -20,6 +20,7 @@ public class UserServiceImpl implements UserService {
     private final EnterpriseRepository enterpriseRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getUserProfile(String username) {
         Account account =
                 accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
