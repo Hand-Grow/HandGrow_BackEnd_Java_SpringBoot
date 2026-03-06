@@ -61,11 +61,12 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Transactional
-    public SimpleResponse addCommitment(UUID campaignId, UUID farmerId, CreateCommitmentRequest request) {
+    public SimpleResponse addCommitment(UUID campaignId, String username, CreateCommitmentRequest request) {
         CollectionCampaign campaign =
                 campaignRepository.findById(campaignId).orElseThrow(() -> new RuntimeException("Campaign not found"));
 
-        Farmer farmer = farmerRepository.findById(farmerId).orElseThrow(() -> new RuntimeException("Farmer not found"));
+        Farmer farmer =
+                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
 
         Plot plot =
                 plotRepository.findById(request.getPlotId()).orElseThrow(() -> new RuntimeException("Plot not found"));
