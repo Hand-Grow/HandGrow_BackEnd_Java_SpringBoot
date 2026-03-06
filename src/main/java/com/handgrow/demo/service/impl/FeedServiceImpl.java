@@ -28,7 +28,11 @@ public class FeedServiceImpl implements FeedService {
     private final FarmerRepository farmerRepository;
 
     @Transactional
-    public List<FeedItemResponse> getFeed(UUID coopId, UUID farmerId, Pageable pageable) {
+    public List<FeedItemResponse> getFeed(UUID coopId, String username, Pageable pageable) {
+        Farmer farmer =
+                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
+        UUID farmerId = farmer.getId();
+
         List<FeedItemResponse> feed = new ArrayList<>();
 
         List<CoopAnnouncement> announcements =
@@ -73,8 +77,10 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Transactional
-    public void toggleLike(UUID farmerId, UUID targetId, FeedTargetType type) {
-        Farmer farmer = farmerRepository.findById(farmerId).orElseThrow(() -> new RuntimeException("Farmer not found"));
+    public void toggleLike(String username, UUID targetId, FeedTargetType type) {
+        Farmer farmer =
+                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
+        UUID farmerId = farmer.getId();
 
         var existing = likeRepository.findByFarmerIdAndTargetIdAndTargetType(farmerId, targetId, type);
         if (existing.isPresent()) {
@@ -101,8 +107,10 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Transactional
-    public CommentResponse addComment(UUID farmerId, UUID targetId, FeedTargetType type, CreateCommentRequest request) {
-        Farmer farmer = farmerRepository.findById(farmerId).orElseThrow(() -> new RuntimeException("Farmer not found"));
+    public CommentResponse addComment(
+            String username, UUID targetId, FeedTargetType type, CreateCommentRequest request) {
+        Farmer farmer =
+                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
 
         FeedComment comment = commentRepository.save(FeedComment.builder()
                 .farmer(farmer)

@@ -26,5 +26,6 @@ public class CoopAnnouncement extends BaseEntity {
 
     @Column(name = "attachments", columnDefinition = "jsonb")
     @Convert(converter = StringListConverter.class)
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     private List<String> attachments; // Array of image URLs
 }
