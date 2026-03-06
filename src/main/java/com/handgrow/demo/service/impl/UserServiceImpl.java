@@ -42,6 +42,13 @@ public class UserServiceImpl implements UserService {
         Farmer farmer =
                 farmerRepository.findByAccount(account).orElseThrow(() -> new RuntimeException("Farmer not found"));
 
+        String cooperativeId = null;
+        String cooperativeName = null;
+        if (farmer.getCooperative() != null) {
+            cooperativeId = farmer.getCooperative().getId().toString();
+            cooperativeName = farmer.getCooperative().getName();
+        }
+
         return UserResponse.builder()
                 .id(farmer.getId().toString())
                 .fullName(farmer.getFullName())
@@ -53,6 +60,8 @@ public class UserServiceImpl implements UserService {
                 .commune(farmer.getCommune())
                 .province(farmer.getProvince())
                 .produce(farmer.getProduce() != null ? farmer.getProduce().name() : null)
+                .cooperativeId(cooperativeId)
+                .cooperativeName(cooperativeName)
                 .build();
     }
 
