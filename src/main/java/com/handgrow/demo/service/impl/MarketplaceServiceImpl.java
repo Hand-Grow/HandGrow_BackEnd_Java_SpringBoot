@@ -3,6 +3,7 @@ package com.handgrow.demo.service.impl;
 import com.handgrow.demo.dto.request.CreateOfferRequest;
 import com.handgrow.demo.dto.request.UpdateBulkSaleRequest;
 import com.handgrow.demo.dto.response.BulkSaleResponse;
+import com.handgrow.demo.dto.response.CommitmentResponse;
 import com.handgrow.demo.dto.response.OfferResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.entity.BulkSale;
@@ -11,6 +12,7 @@ import com.handgrow.demo.entity.SaleOffer;
 import com.handgrow.demo.entity.enums.BulkSaleStatus;
 import com.handgrow.demo.entity.enums.OfferStatus;
 import com.handgrow.demo.repository.BulkSaleRepository;
+import com.handgrow.demo.repository.CollectionCommitmentRepository;
 import com.handgrow.demo.repository.EnterpriseRepository;
 import com.handgrow.demo.repository.SaleOfferRepository;
 import com.handgrow.demo.service.MarketplaceService;
@@ -29,12 +31,14 @@ public class MarketplaceServiceImpl implements MarketplaceService {
     private final BulkSaleRepository bulkSaleRepository;
     private final SaleOfferRepository offerRepository;
     private final EnterpriseRepository enterpriseRepository;
+    private final CollectionCommitmentRepository commitmentRepository;
 
     @Transactional
     public List<BulkSaleResponse> searchBulkSales(Pageable pageable) {
         return bulkSaleRepository.findByStatus(BulkSaleStatus.OPEN, pageable).stream()
                 .map(b -> BulkSaleResponse.builder()
                         .id(b.getId())
+                        .campaignId(b.getCampaign() != null ? b.getCampaign().getId() : null)
                         .productName(b.getProductName())
                         .totalQuantity(b.getTotalQuantity())
                         .expectedPrice(b.getExpectedPrice())
@@ -51,6 +55,7 @@ public class MarketplaceServiceImpl implements MarketplaceService {
 
         return BulkSaleResponse.builder()
                 .id(sale.getId())
+                .campaignId(sale.getCampaign() != null ? sale.getCampaign().getId() : null)
                 .productName(sale.getProductName())
                 .totalQuantity(sale.getTotalQuantity())
                 .expectedPrice(sale.getExpectedPrice())
@@ -58,6 +63,26 @@ public class MarketplaceServiceImpl implements MarketplaceService {
                 .coopName(sale.getCooperative().getName())
                 .createdAt(sale.getCreatedAt())
                 .build();
+    }
+
+    @Transactional
+    public List<CommitmentResponse> getCommitmentsByBulkSaleId(UUID bulkSaleId, Pageable pageable) {
+        BulkSale sale =
+                bulkSaleRepository.findById(bulkSaleId).orElseThrow(() -> new RuntimeException("Bulk sale not found"));
+
+        if (sale.getCampaign() == null) {
+            return List.of();
+        }
+
+        return commitmentRepository.findByCampaignId(sale.getCampaign().getId(), pageable).stream()
+                .map(c -> CommitmentResponse.builder()
+                        .id(c.getId())
+                        .farmerName(c.getFarmer().getFullName())
+                        .plotName(c.getPlot().getName())
+                        .quantity(c.getCommittedQuantity())
+                        .createdAt(c.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Transactional
