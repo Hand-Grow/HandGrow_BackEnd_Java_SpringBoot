@@ -26,8 +26,8 @@ jobs:
           context: .
           push: true
           tags: |
-            your-docker-username/handgrow-backend:latest
-            your-docker-username/handgrow-backend:${{ github.sha }}
+            mikazuki2106/handgrow-backend:latest
+            mikazuki2106/handgrow-backend:${{ github.sha }}
 
 
       - name: Trigger Render Deploy
