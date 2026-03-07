@@ -1,7 +1,5 @@
 package com.handgrow.demo.dto.request;
 
-import java.time.LocalDate;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCampaignRequest {
-    private String productName;
-    private String title;
+public class SendChatMessageRequest {
     private String content;
-    private List<String> attachments;
-    private LocalDate expectedDate;
+    private String senderType; // "ENTERPRISE" or "COOPERATIVE"
 }

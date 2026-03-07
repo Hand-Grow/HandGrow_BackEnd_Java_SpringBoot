@@ -2,6 +2,7 @@ package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.CreateOfferRequest;
 import com.handgrow.demo.dto.response.BulkSaleResponse;
+import com.handgrow.demo.dto.response.CommitmentResponse;
 import com.handgrow.demo.dto.response.OfferResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.entity.enums.OfferStatus;
@@ -29,6 +30,11 @@ public class MarketplaceController {
     @GetMapping("/bulk-sales/{id}")
     public ResponseEntity<BulkSaleResponse> getBulkSaleDetail(@PathVariable UUID id) {
         return ResponseEntity.ok(marketplaceService.getBulkSaleDetail(id));
+    }
+
+    @GetMapping("/bulk-sales/{id}/commitments")
+    public ResponseEntity<List<CommitmentResponse>> getCommitmentsByBulkSale(@PathVariable UUID id, Pageable pageable) {
+        return ResponseEntity.ok(marketplaceService.getCommitmentsByBulkSaleId(id, pageable));
     }
 
     @PostMapping("/bulk-sales/{id}/offers")

@@ -3,6 +3,7 @@ package com.handgrow.demo.service;
 import com.handgrow.demo.dto.request.CreateOfferRequest;
 import com.handgrow.demo.dto.request.UpdateBulkSaleRequest;
 import com.handgrow.demo.dto.response.BulkSaleResponse;
+import com.handgrow.demo.dto.response.CommitmentResponse;
 import com.handgrow.demo.dto.response.OfferResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.entity.enums.OfferStatus;
@@ -14,6 +15,8 @@ public interface MarketplaceService {
     List<BulkSaleResponse> searchBulkSales(Pageable pageable);
 
     BulkSaleResponse getBulkSaleDetail(UUID id);
+
+    List<CommitmentResponse> getCommitmentsByBulkSaleId(UUID bulkSaleId, Pageable pageable);
 
     SimpleResponse updateBulkSale(UUID id, UpdateBulkSaleRequest request);
 

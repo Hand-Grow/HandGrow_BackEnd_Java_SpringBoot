@@ -1,7 +1,5 @@
 package com.handgrow.demo.dto.response;
 
-import com.handgrow.demo.entity.enums.BulkSaleStatus;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -13,13 +11,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BulkSaleResponse {
+public class ChatRoomResponse {
     private UUID id;
-    private UUID campaignId;
+    private UUID bulkSaleId;
     private String productName;
-    private BigDecimal totalQuantity;
-    private BigDecimal expectedPrice;
-    private BulkSaleStatus status;
-    private String coopName;
+    private UUID cooperativeId;
+    private String cooperativeName;
+    private UUID enterpriseId;
+    private String enterpriseName;
+    private String status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

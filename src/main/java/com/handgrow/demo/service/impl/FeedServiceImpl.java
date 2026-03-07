@@ -60,11 +60,14 @@ public class FeedServiceImpl implements FeedService {
             List<CollectionCampaign> campaigns =
                     campaignRepository.findByCooperativeIdOrderByCreatedAtDesc(coopId, pageable);
             for (CollectionCampaign c : campaigns) {
+                String feedTitle = c.getTitle() != null ? c.getTitle() : c.getProductName();
+                String feedContent = c.getContent() != null ? c.getContent() : "Ngày dự kiến: " + c.getExpectedDate();
+
                 feed.add(FeedItemResponse.builder()
                         .id(c.getId())
                         .type(FeedTargetType.CAMPAIGN)
-                        .title(c.getProductName())
-                        .content("Ngày dự kiến: " + c.getExpectedDate())
+                        .title(feedTitle)
+                        .content(feedContent)
                         .likeCount(likeRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
                         .commentCount(
                                 commentRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))

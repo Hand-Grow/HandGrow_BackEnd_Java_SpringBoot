@@ -54,6 +54,9 @@ public class CampaignServiceImpl implements CampaignService {
         campaignRepository.save(CollectionCampaign.builder()
                 .cooperative(coop)
                 .productName(request.getProductName())
+                .title(request.getTitle())
+                .content(request.getContent())
+                .attachments(request.getAttachments())
                 .expectedDate(request.getExpectedDate())
                 .build());
 
