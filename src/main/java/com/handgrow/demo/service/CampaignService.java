@@ -18,5 +18,5 @@ public interface CampaignService {
 
     List<CommitmentResponse> getCommitments(UUID campaignId, Pageable pageable);
 
-    SimpleResponse publishToB2B(UUID campaignId);
+    SimpleResponse publishToB2B(UUID campaignId, com.handgrow.demo.dto.request.PublishToB2BRequest request);
 }

@@ -98,7 +98,7 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Transactional
-    public SimpleResponse publishToB2B(UUID campaignId) {
+    public SimpleResponse publishToB2B(UUID campaignId, com.handgrow.demo.dto.request.PublishToB2BRequest request) {
         CollectionCampaign campaign =
                 campaignRepository.findById(campaignId).orElseThrow(() -> new RuntimeException("Campaign not found"));
 
@@ -112,6 +112,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .campaign(campaign)
                 .productName(campaign.getProductName())
                 .totalQuantity(totalQuantity)
+                .expectedPrice(request.getExpectedPrice())
                 .status(BulkSaleStatus.OPEN)
                 .build());
 
