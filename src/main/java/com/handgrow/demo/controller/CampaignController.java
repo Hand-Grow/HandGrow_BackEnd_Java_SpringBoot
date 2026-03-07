@@ -50,8 +50,9 @@ public class CampaignController {
     }
 
     @PostMapping("/campaigns/{id}/publish-to-b2b")
-    public ResponseEntity<SimpleResponse> publishToB2B(@PathVariable UUID id) {
-        return ResponseEntity.ok(campaignService.publishToB2B(id));
+    public ResponseEntity<SimpleResponse> publishToB2B(
+            @PathVariable UUID id, @RequestBody com.handgrow.demo.dto.request.PublishToB2BRequest request) {
+        return ResponseEntity.ok(campaignService.publishToB2B(id, request));
     }
 
     @PutMapping("/bulk-sales/{id}")
