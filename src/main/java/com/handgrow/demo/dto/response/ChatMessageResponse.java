@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageResponse {
-    private UUID id;
+    private String id;
     private UUID senderId;
     private String senderType;
     private String senderName; // Name of Coop or Enterprise

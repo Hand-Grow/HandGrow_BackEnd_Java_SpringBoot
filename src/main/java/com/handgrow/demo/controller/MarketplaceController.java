@@ -6,6 +6,7 @@ import com.handgrow.demo.dto.response.CommitmentResponse;
 import com.handgrow.demo.dto.response.OfferResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.entity.enums.OfferStatus;
+import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.service.MarketplaceService;
 import java.security.Principal;
 import java.util.List;
@@ -21,6 +22,14 @@ import org.springframework.web.bind.annotation.*;
 public class MarketplaceController {
 
     private final MarketplaceService marketplaceService;
+    private final AccountRepository accountRepository;
+
+    private UUID getAccountId(Principal principal) {
+        return accountRepository
+                .findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Account not found"))
+                .getId();
+    }
 
     @GetMapping("/bulk-sales")
     public ResponseEntity<List<BulkSaleResponse>> searchBulkSales(Pageable pageable) {
@@ -40,14 +49,14 @@ public class MarketplaceController {
     @PostMapping("/bulk-sales/{id}/offers")
     public ResponseEntity<SimpleResponse> createOffer(
             @PathVariable UUID id, @RequestBody CreateOfferRequest request, Principal principal) {
-        UUID enterpriseId = UUID.fromString(principal.getName());
+        UUID enterpriseId = getAccountId(principal);
         return ResponseEntity.ok(marketplaceService.createOffer(id, enterpriseId, request));
     }
 
     @GetMapping("/enterprises/me/offers")
     public ResponseEntity<List<OfferResponse>> getMyOffers(
             @RequestParam(required = false) String status, Principal principal, Pageable pageable) {
-        UUID enterpriseId = UUID.fromString(principal.getName());
+        UUID enterpriseId = getAccountId(principal);
         OfferStatus offerStatus = status != null ? OfferStatus.valueOf(status.toUpperCase()) : OfferStatus.PENDING;
         return ResponseEntity.ok(marketplaceService.getMyOffers(enterpriseId, offerStatus, pageable));
     }
