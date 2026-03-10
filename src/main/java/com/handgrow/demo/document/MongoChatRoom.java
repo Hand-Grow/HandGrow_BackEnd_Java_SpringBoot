@@ -1,7 +1,6 @@
 package com.handgrow.demo.document;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -23,21 +22,21 @@ public class MongoChatRoom {
 
     @Indexed
     @Field("bulk_sale_id")
-    private UUID bulkSaleId;
+    private String bulkSaleId;
 
     @Field("product_name")
     private String productName;
 
     @Indexed
     @Field("coop_id")
-    private UUID cooperativeId;
+    private String cooperativeId;
 
     @Field("coop_name")
     private String cooperativeName;
 
     @Indexed
     @Field("enterprise_id")
-    private UUID enterpriseId;
+    private String enterpriseId;
 
     @Field("enterprise_name")
     private String enterpriseName;

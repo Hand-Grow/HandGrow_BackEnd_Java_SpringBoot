@@ -50,14 +50,15 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new RuntimeException("BulkSale not found"));
 
         MongoChatRoom room = chatRoomRepository
-                .findByBulkSaleIdAndEnterpriseId(bulkSale.getId(), enterprise.getId())
+                .findByBulkSaleIdAndEnterpriseId(
+                        bulkSale.getId().toString(), enterprise.getId().toString())
                 .orElseGet(() -> {
                     MongoChatRoom newRoom = MongoChatRoom.builder()
-                            .bulkSaleId(bulkSale.getId())
+                            .bulkSaleId(bulkSale.getId().toString())
                             .productName(bulkSale.getProductName())
-                            .cooperativeId(bulkSale.getCooperative().getId())
+                            .cooperativeId(bulkSale.getCooperative().getId().toString())
                             .cooperativeName(bulkSale.getCooperative().getName())
-                            .enterpriseId(enterprise.getId())
+                            .enterpriseId(enterprise.getId().toString())
                             .enterpriseName(enterprise.getName())
                             .status("ACTIVE")
                             .createdAt(LocalDateTime.now())
@@ -81,23 +82,36 @@ public class ChatServiceImpl implements ChatService {
             Enterprise enterprise = enterpriseRepository
                     .findByAccount(account)
                     .orElseThrow(() -> new RuntimeException("Enterprise not found"));
-            rooms = chatRoomRepository.findByEnterpriseIdOrderByUpdatedAtDesc(enterprise.getId());
+            rooms = chatRoomRepository.findByEnterpriseIdOrderByUpdatedAtDesc(
+                    enterprise.getId().toString());
         } else if (role.equals("COOPERATIVE")) {
             Cooperative cooperative = cooperativeRepository
                     .findByAccount(account)
                     .orElseThrow(() -> new RuntimeException("Cooperative config not found"));
-            rooms = chatRoomRepository.findByCooperativeIdOrderByUpdatedAtDesc(cooperative.getId());
+            rooms = chatRoomRepository.findByCooperativeIdOrderByUpdatedAtDesc(
+                    cooperative.getId().toString());
         } else if (role.equals("FARMER")) {
             Farmer farmer = farmerRepository
                     .findByAccount(account)
                     .orElseThrow(() -> new RuntimeException("Farmer config not found"));
             rooms = chatRoomRepository.findByCooperativeIdOrderByUpdatedAtDesc(
-                    farmer.getCooperative().getId());
+                    farmer.getCooperative().getId().toString());
         } else {
             return List.of();
         }
 
-        return rooms.stream().map(this::toChatRoomResponse).collect(Collectors.toList());
+        List<ChatRoomResponse> responseRooms =
+                rooms.stream().map(this::toChatRoomResponse).collect(Collectors.toList());
+        if (responseRooms.isEmpty()) {
+            responseRooms.add(ChatRoomResponse.builder()
+                    .id("DEBUG-FAKE-ROOM")
+                    .productName("DEBUG MODE")
+                    .enterpriseName("SYS: No Rooms Found for your ID")
+                    .cooperativeName("Role: " + role)
+                    .status("DEBUG")
+                    .build());
+        }
+        return responseRooms;
     }
 
     private void validateUserAccessToRoom(MongoChatRoom room, UUID accountId) {
@@ -110,23 +124,30 @@ public class ChatServiceImpl implements ChatService {
                     .findByAccount(account)
                     .orElseThrow(() -> new RuntimeException("Enterprise not found"));
             // Nếu Doanh nghiệp đăng nhập không khớp với Doanh nghiệp của phòng chat -> CÚT!
-            if (!room.getEnterpriseId().equals(enterprise.getId())) {
-                throw new RuntimeException("Access Denied: Bạn không có quyền xem phòng chat này!");
+            if (room.getEnterpriseId() == null
+                    || !room.getEnterpriseId().equals(enterprise.getId().toString())) {
+                throw new RuntimeException("DEBUG ENTERPRISE: Room Ent ID: " + room.getEnterpriseId()
+                        + " != User Ent ID: " + enterprise.getId());
             }
         } else if ("COOPERATIVE".equals(role)) {
             Cooperative cooperative = cooperativeRepository
                     .findByAccount(account)
                     .orElseThrow(() -> new RuntimeException("Cooperative not found"));
             // Nếu HTX đăng nhập không khớp với HTX của phòng chat -> CÚT!
-            if (!room.getCooperativeId().equals(cooperative.getId())) {
-                throw new RuntimeException("Access Denied: Bạn không có quyền xem phòng chat này!");
+            if (room.getCooperativeId() == null
+                    || !room.getCooperativeId().equals(cooperative.getId().toString())) {
+                throw new RuntimeException("DEBUG COOPERATIVE: Room Coop ID: " + room.getCooperativeId()
+                        + " != User Coop ID: " + cooperative.getId());
             }
         } else if ("FARMER".equals(role)) {
             Farmer farmer =
                     farmerRepository.findByAccount(account).orElseThrow(() -> new RuntimeException("Farmer not found"));
             // Nông dân được xem phòng chat của HTX mình
-            if (!room.getCooperativeId().equals(farmer.getCooperative().getId())) {
-                throw new RuntimeException("Access Denied: Bạn không có quyền xem phòng chat này!");
+            if (room.getCooperativeId() == null
+                    || !room.getCooperativeId()
+                            .equals(farmer.getCooperative().getId().toString())) {
+                throw new RuntimeException("DEBUG FARMER: Room Coop ID: " + room.getCooperativeId()
+                        + " != Farmer Coop ID: " + farmer.getCooperative().getId());
             }
         } else {
             throw new RuntimeException("Access Denied: Role không hợp lệ!");
@@ -135,17 +156,48 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<ChatMessageResponse> getMessages(String roomId, UUID accountId, Pageable pageable) {
+        if ("DEBUG-FAKE-ROOM".equals(roomId)) {
+            return List.of(ChatMessageResponse.builder()
+                    .id("debug-1")
+                    .senderType("SYSTEM")
+                    .senderName("Debug Assistant")
+                    .content(
+                            "Hệ thống không tìm thấy phòng chat nào cho tài khoản này trong MongoDB. Bạn có chắc là Company đã gửi tin nhắn chưa?")
+                    .createdAt(LocalDateTime.now())
+                    .build());
+        }
+
         // 1. Tìm phòng chat trước
-        MongoChatRoom room =
-                chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found"));
+        MongoChatRoom room = chatRoomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
 
         // 2. CHẶN CỬA: Kiểm tra quyền truy cập!
-        validateUserAccessToRoom(room, accountId);
+        try {
+            validateUserAccessToRoom(room, accountId);
+        } catch (RuntimeException ex) {
+            return List.of(ChatMessageResponse.builder()
+                    .id("debug-error")
+                    .senderType("SYSTEM")
+                    .senderName("Access Denied Log")
+                    .content(ex.getMessage())
+                    .createdAt(LocalDateTime.now())
+                    .build());
+        }
 
         // 3. Nếu qua ải an toàn, mới lôi data ra trả về
-        return chatMessageRepository.findByRoomIdOrderByCreatedAtAsc(roomId, pageable).stream()
-                .map(this::toMessageResponse)
-                .collect(Collectors.toList());
+        List<MongoChatMessage> msgs = chatMessageRepository.findByRoomIdOrderByCreatedAtAsc(roomId, pageable);
+        if (msgs.isEmpty()) {
+            return List.of(ChatMessageResponse.builder()
+                    .id("debug-empty")
+                    .senderType("SYSTEM")
+                    .senderName("System")
+                    .content("Không có tin nhắn nào trong phòng chat này. Hãy thử nhắn một tin mới!")
+                    .createdAt(LocalDateTime.now())
+                    .build());
+        }
+
+        return msgs.stream().map(this::toMessageResponse).collect(Collectors.toList());
     }
 
     @Transactional
@@ -192,11 +244,11 @@ public class ChatServiceImpl implements ChatService {
     private ChatRoomResponse toChatRoomResponse(MongoChatRoom room) {
         return ChatRoomResponse.builder()
                 .id(room.getId())
-                .bulkSaleId(room.getBulkSaleId())
+                .bulkSaleId(room.getBulkSaleId() != null ? UUID.fromString(room.getBulkSaleId()) : null)
                 .productName(room.getProductName())
-                .cooperativeId(room.getCooperativeId())
+                .cooperativeId(room.getCooperativeId() != null ? UUID.fromString(room.getCooperativeId()) : null)
                 .cooperativeName(room.getCooperativeName())
-                .enterpriseId(room.getEnterpriseId())
+                .enterpriseId(room.getEnterpriseId() != null ? UUID.fromString(room.getEnterpriseId()) : null)
                 .enterpriseName(room.getEnterpriseName())
                 .status(room.getStatus())
                 .createdAt(room.getCreatedAt())
