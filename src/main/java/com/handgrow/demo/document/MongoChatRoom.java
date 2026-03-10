@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "chat_rooms")
 @Getter
@@ -21,35 +20,26 @@ public class MongoChatRoom {
     private String id;
 
     @Indexed
-    @Field("bulk_sale_id")
     private String bulkSaleId;
 
-    @Field("product_name")
     private String productName;
 
     @Indexed
-    @Field("coop_id")
     private String cooperativeId;
 
-    @Field("coop_name")
     private String cooperativeName;
 
     @Indexed
-    @Field("enterprise_id")
     private String enterpriseId;
 
-    @Field("enterprise_name")
     private String enterpriseName;
 
-    @Field("status")
     @Builder.Default
     private String status = "ACTIVE"; // ACTIVE, CLOSED
 
     @CreatedDate
-    @Field("created_at")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Field("updated_at")
     private LocalDateTime updatedAt;
 }

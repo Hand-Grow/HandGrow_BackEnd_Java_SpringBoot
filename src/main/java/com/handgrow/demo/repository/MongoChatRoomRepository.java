@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface MongoChatRoomRepository extends MongoRepository<MongoChatRoom, String> {
     Optional<MongoChatRoom> findByBulkSaleIdAndEnterpriseId(String bulkSaleId, String enterpriseId);
 
-    List<MongoChatRoom> findByEnterpriseIdOrderByUpdatedAtDesc(String enterpriseId);
-
     List<MongoChatRoom> findByCooperativeIdOrderByUpdatedAtDesc(String cooperativeId);
+
+    List<MongoChatRoom> findByEnterpriseIdOrderByUpdatedAtDesc(String enterpriseId);
 }
