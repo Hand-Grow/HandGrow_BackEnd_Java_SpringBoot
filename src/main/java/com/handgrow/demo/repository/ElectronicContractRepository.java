@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ElectronicContractRepository extends JpaRepository<ElectronicContract, UUID> {
-    Optional<ElectronicContract> findByChatRoomId(UUID roomId);
+    Optional<ElectronicContract> findByRoomId(String roomId);
 }

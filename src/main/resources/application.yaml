@@ -14,6 +14,8 @@ spring:
 #      password: ${REDIS_PASSWORD:}
 #      database: ${REDIS_DATABASE:0}
 #      timeout: ${REDIS_TIMEOUT:60000}ms
+    mongodb:
+      uri: ${MONGO_URI}
 
   # ===============================
   # 2. DATABASE CONFIGURATION

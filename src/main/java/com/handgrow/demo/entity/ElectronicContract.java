@@ -15,9 +15,8 @@ import lombok.*;
 @Builder
 public class ElectronicContract extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", nullable = false, unique = true)
-    private ChatRoom chatRoom;
+    @Column(name = "room_id", nullable = false, unique = true)
+    private String roomId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bulk_sale_id", nullable = false)

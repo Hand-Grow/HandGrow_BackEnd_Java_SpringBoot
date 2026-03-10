@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ElectronicContractResponse {
     private UUID id;
-    private UUID roomId;
+    private String roomId;
     private UUID bulkSaleId;
     private String productName;
     private UUID cooperativeId;

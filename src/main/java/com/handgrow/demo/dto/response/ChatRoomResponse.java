@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomResponse {
-    private UUID id;
+    private String id;
     private UUID bulkSaleId;
     private String productName;
     private UUID cooperativeId;
