@@ -39,7 +39,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      ddl-auto: ${JPA_DDL_AUTO:none}
     show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:
@@ -81,3 +81,13 @@ management:
 gemini:
   api:
     key: ${GEMINI_API_KEY}
+# ===============================
+# 6. AWS CONFIGURATION
+# ===============================
+aws:
+  credentials:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+  s3:
+    region: ${AWS_REGION}
+    bucket-name: ${AWS_BUCKET_NAME}
