@@ -122,6 +122,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
                 .farmerName(joinRequest.getFarmer().getFullName())
                 .farmerPhone(joinRequest.getFarmer().getPhoneNumber())
                 .cooperativeName(joinRequest.getCooperative().getName())
+                .cooperativeId(joinRequest.getCooperative().getId().toString())
                 .status(joinRequest.getStatus().name())
                 .responseMessage(joinRequest.getResponseMessage())
                 .createdAt(joinRequest.getCreatedAt().toString())

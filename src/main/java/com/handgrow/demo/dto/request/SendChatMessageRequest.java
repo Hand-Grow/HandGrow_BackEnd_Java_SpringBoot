@@ -1,0 +1,15 @@
+package com.handgrow.demo.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SendChatMessageRequest {
+    private String content;
+    private String senderType; // "ENTERPRISE" or "COOPERATIVE"
+}
