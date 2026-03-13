@@ -70,8 +70,11 @@ public class ContractController {
         return ResponseEntity.ok(response);
     }
 
-    /** Trích xuất AccountId (UUID) từ JWT token đã được Spring Security decode */
+    /** Trích xuất AccountId (UUID) từ principal đã được Spring Security decode */
     private UUID extractAccountId(Authentication authentication) {
-        return UUID.fromString(authentication.getName());
+        if (authentication.getPrincipal() instanceof com.handgrow.demo.entity.Account account) {
+            return account.getId();
+        }
+        throw new RuntimeException("User not authenticated correctly");
     }
 }
