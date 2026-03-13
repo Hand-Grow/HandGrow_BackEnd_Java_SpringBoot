@@ -27,7 +27,6 @@ public class ChatServiceImpl implements ChatService {
 
     private final MongoChatRoomRepository chatRoomRepository;
     private final MongoChatMessageRepository chatMessageRepository;
-    private final ElectronicContractRepository contractRepository;
     private final BulkSaleRepository bulkSaleRepository;
     private final EnterpriseRepository enterpriseRepository;
     private final AccountRepository accountRepository;
@@ -98,7 +97,7 @@ public class ChatServiceImpl implements ChatService {
                     .findByAccount(account)
                     .orElseThrow(() -> new RuntimeException("Farmer config not found"));
             rooms = chatRoomRepository.findByCooperativeIdOrderByUpdatedAtDesc(
-                    farmer.getCooperative().getId().toString());
+                    farmer.getCooperative().getId().toString()); // Don't have func for farmer so that it just mock
         } else {
             log.warn("Role {} did not match any condition in getMyRooms. Returning empty list.", role);
             return List.of();

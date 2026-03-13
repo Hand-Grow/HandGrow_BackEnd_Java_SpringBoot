@@ -80,7 +80,8 @@ management:
 
 gemini:
   api:
-    key: ${GEMINI_API_KEY}
+    # Để trống → app vẫn chạy, AI draft sẽ fallback dùng dữ liệu BulkSale
+    key: ${GEMINI_API_KEY:}
 # ===============================
 # 6. AWS CONFIGURATION
 # ===============================
