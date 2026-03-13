@@ -80,7 +80,7 @@ management:
 
 gemini:
   api:
-    key: ${GEMINI_API_KEY}
+    key: ${GEMINI_API_KEY:}
 # ===============================
 # 6. AWS CONFIGURATION
 # ===============================

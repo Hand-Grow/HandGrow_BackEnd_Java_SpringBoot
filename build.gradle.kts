@@ -57,6 +57,8 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	// AWS S3 dependency
 	implementation("software.amazon.awssdk:s3:2.25.11")
+	// WebFlux — needed for WebClient to call Gemini HTTP API
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 }
 
 tasks.withType<Test> {
