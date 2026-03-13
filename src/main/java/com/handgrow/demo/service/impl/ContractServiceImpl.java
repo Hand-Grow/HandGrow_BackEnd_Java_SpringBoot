@@ -5,11 +5,14 @@ import com.handgrow.demo.document.MongoChatRoom;
 import com.handgrow.demo.dto.request.CreateContractRequest;
 import com.handgrow.demo.dto.response.DraftContractResponse;
 import com.handgrow.demo.dto.response.ElectronicContractResponse;
+import com.handgrow.demo.entity.Account;
 import com.handgrow.demo.entity.BulkSale;
 import com.handgrow.demo.entity.Cooperative;
 import com.handgrow.demo.entity.ElectronicContract;
 import com.handgrow.demo.entity.Enterprise;
+import com.handgrow.demo.entity.Farmer;
 import com.handgrow.demo.entity.enums.ContractStatus;
+import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.repository.BulkSaleRepository;
 import com.handgrow.demo.repository.CooperativeRepository;
 import com.handgrow.demo.repository.ElectronicContractRepository;
@@ -36,6 +39,8 @@ public class ContractServiceImpl implements ContractService {
     private final CooperativeRepository cooperativeRepository;
     private final EnterpriseRepository enterpriseRepository;
     private final ElectronicContractRepository contractRepository;
+    private final AccountRepository accountRepository;
+    private final FarmerRepository farmerRepository;
     private final AiContractServiceImpl aiContractService;
 
     // ─── 1. AI Draft ────────────────────────────────────────────────────────
@@ -139,6 +144,41 @@ public class ContractServiceImpl implements ContractService {
         Enterprise enterprise = contract.getEnterprise();
 
         return toContractResponse(contract, bulkSale, cooperative, enterprise);
+    }
+
+    @Override
+    public List<ElectronicContractResponse> getMyContracts(UUID accountId) {
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+        String role = account.getRole().getName();
+
+        List<ElectronicContract> contracts;
+        if (role.equals("ENTERPRISE")) {
+            Enterprise enterprise = enterpriseRepository
+                    .findByAccount(account)
+                    .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+            contracts = contractRepository.findByEnterpriseIdOrderByCreatedAtDesc(enterprise.getId());
+        } else if (role.equals("COOP")
+                || role.equals("COOPERATIVE")
+                || role.equals("ROLE_COOP")
+                || role.equals("ROLE_COOPERATIVE")) {
+            Cooperative cooperative = cooperativeRepository
+                    .findByAccount(account)
+                    .orElseThrow(() -> new RuntimeException("Cooperative config not found"));
+            contracts = contractRepository.findByCooperativeIdOrderByCreatedAtDesc(cooperative.getId());
+        } else if (role.equals("FARMER")) {
+            Farmer farmer = farmerRepository
+                    .findByAccount(account)
+                    .orElseThrow(() -> new RuntimeException("Farmer config not found"));
+            contracts = contractRepository.findByCooperativeIdOrderByCreatedAtDesc(
+                    farmer.getCooperative().getId());
+        } else {
+            return List.of();
+        }
+
+        return contracts.stream()
+                .map(c -> toContractResponse(c, c.getBulkSale(), c.getCooperative(), c.getEnterprise()))
+                .collect(Collectors.toList());
     }
 
     // ─── Private Helpers ─────────────────────────────────────────────────────
