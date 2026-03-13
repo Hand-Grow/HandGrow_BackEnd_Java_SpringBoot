@@ -17,6 +17,7 @@ import com.handgrow.demo.repository.BulkSaleRepository;
 import com.handgrow.demo.repository.CooperativeRepository;
 import com.handgrow.demo.repository.ElectronicContractRepository;
 import com.handgrow.demo.repository.EnterpriseRepository;
+import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.MongoChatMessageRepository;
 import com.handgrow.demo.repository.MongoChatRoomRepository;
 import com.handgrow.demo.service.ContractService;
