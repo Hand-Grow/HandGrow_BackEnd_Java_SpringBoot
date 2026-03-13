@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MongoChatMessageRepository extends MongoRepository<MongoChatMessage, String> {
     List<MongoChatMessage> findByRoomIdOrderByCreatedAtAsc(String roomId, Pageable pageable);
+
+    List<MongoChatMessage> findTop50ByRoomIdOrderByCreatedAtDesc(String roomId);
 }
