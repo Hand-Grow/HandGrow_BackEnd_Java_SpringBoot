@@ -8,14 +8,6 @@
 -- TRUNCATE existing data for a clean seed (OPTIONAL - UNCOMMENT IF NEEDED)
 -- TRUNCATE TABLE farming_diaries, collection_commitments, sale_offers, bulk_sales, electronic_contracts, join_requests, plots, collection_campaigns, farmers, enterprises, cooperatives, accounts, roles CASCADE;
 
--- 1. ROLES
-INSERT INTO roles (id, name, description, is_active, created_at, updated_at) VALUES
-('11111111-1111-1111-1111-111111111111', 'ADMIN', 'System Administrator', true, NOW(), NOW()),
-('22222222-2222-2222-2222-222222222222', 'COOP', 'Cooperative Manager', true, NOW(), NOW()),
-('33333333-3333-3333-3333-333333333333', 'ENTERPRISE', 'Retail/Export Company', true, NOW(), NOW()),
-('44444444-4444-4444-4444-444444444444', 'FARMER', 'Individual Farmer', true, NOW(), NOW())
-ON CONFLICT (name) DO NOTHING;
-
 -- 2. ACCOUNTS
 INSERT INTO accounts (id, username, password_hash, role_id, is_active, created_at, updated_at) VALUES
 -- Admin
@@ -100,7 +92,7 @@ INSERT INTO bulk_sales (id, coop_id, campaign_id, product_name, total_quantity, 
 ('s1111111-1111-1111-1111-111111111111', 'c1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111', 'Lúa ST25 Đặc Sản', 500.0, 10500.0, 'OPEN', NOW(), NOW()),
 ('s1111111-2222-2222-2222-222222222222', 'c1111111-1111-1111-1111-111111111111', NULL, 'Gạo Thơm Jasmine', 200.0, 8000.0, 'NEGOTIATING', NOW(), NOW());
 
--- 10. SALE OFFERS
+-- 10. SALE OFFERS2
 INSERT INTO sale_offers (id, bulk_sale_id, enterprise_id, offered_price, message, status, created_at, updated_at) VALUES
 ('o1111111-1111-1111-1111-111111111111', 's1111111-1111-1111-1111-111111111111', 'e1111111-3333-3333-3333-333333333333', 10200.0, 'Chúng tôi trả giá 10.200đ cho lô hàng lúa ST25.', 'PENDING', NOW(), NOW()),
 ('o1111111-2222-2222-2222-222222222222', 's1111111-2222-2222-2222-222222222222', 'e1111111-1111-1111-1111-111111111111', 8200.0, 'Giá tốt cho gạo WinMart.', 'ACCEPTED', NOW(), NOW());

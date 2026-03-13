@@ -43,6 +43,7 @@ public class FeedServiceImpl implements FeedService {
                         .type(FeedTargetType.ANNOUNCEMENT)
                         .title(a.getTitle())
                         .content(a.getContent())
+                        .attachments(a.getAttachments())
                         .likeCount(likeRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
                         .commentCount(
                                 commentRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
@@ -60,14 +61,14 @@ public class FeedServiceImpl implements FeedService {
             List<CollectionCampaign> campaigns =
                     campaignRepository.findByCooperativeIdOrderByCreatedAtDesc(coopId, pageable);
             for (CollectionCampaign c : campaigns) {
-                String feedTitle = c.getTitle() != null ? c.getTitle() : c.getProductName();
-                String feedContent = c.getContent() != null ? c.getContent() : "Ngày dự kiến: " + c.getExpectedDate();
-
                 feed.add(FeedItemResponse.builder()
                         .id(c.getId())
                         .type(FeedTargetType.CAMPAIGN)
-                        .title(feedTitle)
-                        .content(feedContent)
+                        .title(c.getTitle())
+                        .content(c.getContent())
+                        .productName(c.getProductName())
+                        .expectedDate(c.getExpectedDate())
+                        .attachments(c.getAttachments())
                         .likeCount(likeRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
                         .commentCount(
                                 commentRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
