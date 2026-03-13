@@ -70,6 +70,17 @@ public class ContractController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/my")
+    @Operation(
+            summary = "Lấy danh sách hợp đồng của tôi",
+            description =
+                    "Trả về danh sách hợp đồng của HTX hoặc Doanh nghiệp đang đăng nhập. Yêu cầu JWT Authentication.")
+    public ResponseEntity<java.util.List<ElectronicContractResponse>> getMyContracts(Authentication authentication) {
+        UUID accountId = extractAccountId(authentication);
+        log.info("Get my contracts for accountId={}", accountId);
+        return ResponseEntity.ok(contractService.getMyContracts(accountId));
+    }
+
     /** Trích xuất AccountId (UUID) từ principal đã được Spring Security decode */
     private UUID extractAccountId(Authentication authentication) {
         if (authentication.getPrincipal() instanceof com.handgrow.demo.entity.Account account) {

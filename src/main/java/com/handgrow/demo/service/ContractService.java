@@ -32,4 +32,12 @@ public interface ContractService {
      * @return ElectronicContractResponse hoặc null nếu chưa tạo
      */
     ElectronicContractResponse getContractByRoom(String roomId);
+
+    /**
+     * Lấy danh sách hợp đồng của người dùng đang đăng nhập (HTX hoặc Doanh nghiệp).
+     *
+     * @param accountId account đang đăng nhập
+     * @return Danh sách hợp đồng
+     */
+    java.util.List<ElectronicContractResponse> getMyContracts(UUID accountId);
 }
