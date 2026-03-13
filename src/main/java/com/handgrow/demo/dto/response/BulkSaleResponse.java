@@ -21,5 +21,6 @@ public class BulkSaleResponse {
     private BigDecimal expectedPrice;
     private BulkSaleStatus status;
     private String coopName;
+    private java.util.List<String> attachments;
     private LocalDateTime createdAt;
 }

@@ -44,6 +44,7 @@ public class MarketplaceServiceImpl implements MarketplaceService {
                         .expectedPrice(b.getExpectedPrice())
                         .status(b.getStatus())
                         .coopName(b.getCooperative().getName())
+                        .attachments(b.getAttachments())
                         .createdAt(b.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
@@ -61,6 +62,7 @@ public class MarketplaceServiceImpl implements MarketplaceService {
                 .expectedPrice(sale.getExpectedPrice())
                 .status(sale.getStatus())
                 .coopName(sale.getCooperative().getName())
+                .attachments(sale.getAttachments())
                 .createdAt(sale.getCreatedAt())
                 .build();
     }
@@ -90,9 +92,10 @@ public class MarketplaceServiceImpl implements MarketplaceService {
         BulkSale sale = bulkSaleRepository.findById(id).orElseThrow(() -> new RuntimeException("Bulk sale not found"));
 
         sale.setExpectedPrice(request.getExpectedPrice());
+        sale.setAttachments(request.getAttachments());
         bulkSaleRepository.save(sale);
 
-        return new SimpleResponse("Đã cập nhật giá", true);
+        return new SimpleResponse("Đã cập nhật thông tin", true);
     }
 
     @Transactional
