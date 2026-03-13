@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateBulkSaleRequest {
     private BigDecimal expectedPrice;
+    private java.util.List<String> attachments;
 }
