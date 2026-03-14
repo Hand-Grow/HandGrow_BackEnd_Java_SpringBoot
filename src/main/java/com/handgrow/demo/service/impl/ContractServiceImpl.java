@@ -21,7 +21,6 @@ import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.MongoChatMessageRepository;
 import com.handgrow.demo.repository.MongoChatRoomRepository;
 import com.handgrow.demo.service.ContractService;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
