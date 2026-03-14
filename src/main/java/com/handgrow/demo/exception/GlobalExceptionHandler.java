@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
+        if (e.getMessage().contains("not found")) {
+            response.put("error", "Resource not found");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
         response.put("error", "Internal server error");
         response.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
