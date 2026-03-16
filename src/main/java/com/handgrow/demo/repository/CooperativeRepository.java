@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CooperativeRepository extends JpaRepository<Cooperative, UUID> {
     Optional<Cooperative> findByAccount(Account account);
+
     Optional<Cooperative> findByAccountId(UUID accountId);
 
     List<Cooperative> findByCommune(String commune);

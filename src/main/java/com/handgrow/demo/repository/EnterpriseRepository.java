@@ -10,5 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, UUID> {
     Optional<Enterprise> findByAccount(Account account);
+
     Optional<Enterprise> findByAccountId(UUID accountId);
 }

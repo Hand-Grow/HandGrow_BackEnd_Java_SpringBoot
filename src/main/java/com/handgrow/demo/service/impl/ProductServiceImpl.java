@@ -25,7 +25,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse createProduct(UUID enterpriseAccountId, CreateProductRequest request) {
-        Enterprise enterprise = enterpriseRepository.findByAccountId(enterpriseAccountId)
+        Enterprise enterprise = enterpriseRepository
+                .findByAccountId(enterpriseAccountId)
                 .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
 
         Product product = Product.builder()
@@ -49,9 +50,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByEnterprise(UUID enterpriseAccountId, Pageable pageable) {
-        Enterprise enterprise = enterpriseRepository.findByAccountId(enterpriseAccountId)
+        Enterprise enterprise = enterpriseRepository
+                .findByAccountId(enterpriseAccountId)
                 .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
-        
+
         return productRepository.findByEnterpriseId(enterprise.getId(), pageable).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -68,8 +70,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductResponse getProductById(UUID id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
         return mapToResponse(product);
     }
 

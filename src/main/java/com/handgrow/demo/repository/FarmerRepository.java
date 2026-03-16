@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FarmerRepository extends JpaRepository<Farmer, UUID> {
     Optional<Farmer> findByAccount(Account account);
+
     Optional<Farmer> findByAccountId(UUID accountId);
 
     @Query("SELECT f FROM Farmer f WHERE f.account.username = :username")

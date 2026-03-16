@@ -23,13 +23,15 @@ public class GroupBuyController {
     private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository.findByUsername(principal.getName())
+        return accountRepository
+                .findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Account not found"))
                 .getId();
     }
 
     @PostMapping("/campaigns")
-    public ResponseEntity<GroupBuyCampaignResponse> createCampaign(@RequestBody CreateGroupBuyCampaignRequest request, Principal principal) {
+    public ResponseEntity<GroupBuyCampaignResponse> createCampaign(
+            @RequestBody CreateGroupBuyCampaignRequest request, Principal principal) {
         return ResponseEntity.ok(groupBuyService.createCampaign(getAccountId(principal), request));
     }
 
@@ -49,7 +51,8 @@ public class GroupBuyController {
     }
 
     @PostMapping("/campaigns/{id}/join")
-    public ResponseEntity<GroupBuyCampaignResponse> joinCampaign(@PathVariable UUID id, @RequestBody JoinGroupBuyRequest request, Principal principal) {
+    public ResponseEntity<GroupBuyCampaignResponse> joinCampaign(
+            @PathVariable UUID id, @RequestBody JoinGroupBuyRequest request, Principal principal) {
         return ResponseEntity.ok(groupBuyService.joinCampaign(id, getAccountId(principal), request));
     }
 

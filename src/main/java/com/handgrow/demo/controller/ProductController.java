@@ -21,13 +21,15 @@ public class ProductController {
     private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository.findByUsername(principal.getName())
+        return accountRepository
+                .findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Account not found"))
                 .getId();
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody CreateProductRequest request, Principal principal) {
+    public ResponseEntity<ProductResponse> createProduct(
+            @RequestBody CreateProductRequest request, Principal principal) {
         return ResponseEntity.ok(productService.createProduct(getAccountId(principal), request));
     }
 

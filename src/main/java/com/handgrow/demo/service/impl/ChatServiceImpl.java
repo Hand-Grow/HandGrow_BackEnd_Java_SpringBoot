@@ -230,7 +230,7 @@ public class ChatServiceImpl implements ChatService {
         ChatMessageResponse response = toMessageResponse(message);
 
         try {
-            messagingTemplate.convertAndSend("/topic/room." + roomId, response);
+            messagingTemplate.convertAndSend("/topic/room/" + roomId, response);
         } catch (Exception e) {
             log.error("Failed to broadcast message to room {}", roomId, e);
         }
@@ -240,10 +240,10 @@ public class ChatServiceImpl implements ChatService {
 
     private ChatRoomResponse toChatRoomResponse(MongoChatRoom room) {
         String entName = room.getEnterpriseName();
-        if (entName == null && room.getEnterpriseId() != null) {
+        if ((entName == null || entName.isBlank()) && room.getEnterpriseId() != null) {
             entName = enterpriseRepository
                     .findById(UUID.fromString(room.getEnterpriseId()))
-                    .map(Enterprise::getName)
+                    .map(ent -> ent.getCompanyName() != null ? ent.getCompanyName() : ent.getName())
                     .orElse(null);
             // Optional: update the room document if we found the name
             if (entName != null) {

@@ -33,10 +33,12 @@ public class GroupBuyServiceImpl implements GroupBuyService {
     @Override
     @Transactional
     public GroupBuyCampaignResponse createCampaign(UUID coopAccountId, CreateGroupBuyCampaignRequest request) {
-        Cooperative coop = cooperativeRepository.findByAccountId(coopAccountId)
+        Cooperative coop = cooperativeRepository
+                .findByAccountId(coopAccountId)
                 .orElseThrow(() -> new RuntimeException("Cooperative not found"));
-        
-        Product product = productRepository.findById(request.getProductId())
+
+        Product product = productRepository
+                .findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         GroupBuyCampaign campaign = GroupBuyCampaign.builder()
@@ -56,7 +58,8 @@ public class GroupBuyServiceImpl implements GroupBuyService {
     @Override
     @Transactional(readOnly = true)
     public List<GroupBuyCampaignResponse> getCampaignsByCooperative(UUID coopAccountId, Pageable pageable) {
-        Cooperative coop = cooperativeRepository.findByAccountId(coopAccountId)
+        Cooperative coop = cooperativeRepository
+                .findByAccountId(coopAccountId)
                 .orElseThrow(() -> new RuntimeException("Cooperative not found"));
         return campaignRepository.findByCooperativeId(coop.getId(), pageable).stream()
                 .map(this::mapToResponse)
@@ -74,25 +77,27 @@ public class GroupBuyServiceImpl implements GroupBuyService {
     @Override
     @Transactional(readOnly = true)
     public GroupBuyCampaignResponse getCampaignById(UUID id) {
-        GroupBuyCampaign campaign = campaignRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Campaign not found"));
+        GroupBuyCampaign campaign =
+                campaignRepository.findById(id).orElseThrow(() -> new RuntimeException("Campaign not found"));
         return mapToResponse(campaign);
     }
 
     @Override
     @Transactional
     public GroupBuyCampaignResponse joinCampaign(UUID campaignId, UUID farmerAccountId, JoinGroupBuyRequest request) {
-        GroupBuyCampaign campaign = campaignRepository.findById(campaignId)
-                .orElseThrow(() -> new RuntimeException("Campaign not found"));
+        GroupBuyCampaign campaign =
+                campaignRepository.findById(campaignId).orElseThrow(() -> new RuntimeException("Campaign not found"));
 
         if (campaign.getStatus() != GroupBuyCampaignStatus.GATHERING) {
             throw new RuntimeException("Campaign is not accepting participations");
         }
 
-        Farmer farmer = farmerRepository.findByAccountId(farmerAccountId)
+        Farmer farmer = farmerRepository
+                .findByAccountId(farmerAccountId)
                 .orElseThrow(() -> new RuntimeException("Farmer not found"));
 
-        GroupBuyParticipation participation = participationRepository.findByCampaignIdAndFarmerId(campaignId, farmer.getId())
+        GroupBuyParticipation participation = participationRepository
+                .findByCampaignIdAndFarmerId(campaignId, farmer.getId())
                 .orElse(GroupBuyParticipation.builder()
                         .campaign(campaign)
                         .farmer(farmer)
@@ -111,10 +116,11 @@ public class GroupBuyServiceImpl implements GroupBuyService {
     @Override
     @Transactional
     public GroupBuyCampaignResponse closeCampaign(UUID campaignId, UUID coopAccountId) {
-        GroupBuyCampaign campaign = campaignRepository.findById(campaignId)
-                .orElseThrow(() -> new RuntimeException("Campaign not found"));
+        GroupBuyCampaign campaign =
+                campaignRepository.findById(campaignId).orElseThrow(() -> new RuntimeException("Campaign not found"));
 
-        Cooperative coop = cooperativeRepository.findByAccountId(coopAccountId)
+        Cooperative coop = cooperativeRepository
+                .findByAccountId(coopAccountId)
                 .orElseThrow(() -> new RuntimeException("Cooperative not found"));
 
         if (!campaign.getCooperative().getId().equals(coop.getId())) {
@@ -126,7 +132,7 @@ public class GroupBuyServiceImpl implements GroupBuyService {
         }
 
         campaign.setStatus(GroupBuyCampaignStatus.CLOSED);
-        
+
         // Create consolidated order
         GroupBuyOrder order = GroupBuyOrder.builder()
                 .campaign(campaign)
@@ -135,10 +141,10 @@ public class GroupBuyServiceImpl implements GroupBuyService {
                 .finalUnitPrice(campaign.getCurrentUnitPrice())
                 .totalAmount(campaign.getTotalCommittedQty().multiply(campaign.getCurrentUnitPrice()))
                 .build();
-        
+
         GroupBuyOrder savedOrder = orderRepository.save(order);
         campaign.setFinalOrder(savedOrder);
-        
+
         // Lock prices for all participations
         List<GroupBuyParticipation> participations = participationRepository.findByCampaignId(campaignId);
         participations.forEach(p -> {
@@ -173,7 +179,7 @@ public class GroupBuyServiceImpl implements GroupBuyService {
         // Tier pricing logic
         Product product = campaign.getProduct();
         List<Product.PriceTier> tiers = product.getPriceTiers();
-        
+
         BigDecimal newPrice = product.getBasePrice();
         if (tiers != null && !tiers.isEmpty()) {
             // Sort tiers by minQty descending to find the highest applicable tier
@@ -195,7 +201,7 @@ public class GroupBuyServiceImpl implements GroupBuyService {
     private GroupBuyCampaignResponse mapToResponse(GroupBuyCampaign campaign) {
         BigDecimal totalQty = campaign.getTotalCommittedQty();
         List<Product.PriceTier> tiers = campaign.getProduct().getPriceTiers();
-        
+
         Double progressPercent = 0.0;
         String nextTierLabel = "Đã đạt giá sàn";
 
@@ -242,7 +248,9 @@ public class GroupBuyServiceImpl implements GroupBuyService {
                 .deadlineDate(campaign.getDeadlineDate())
                 .totalCommittedQty(campaign.getTotalCommittedQty())
                 .currentUnitPrice(campaign.getCurrentUnitPrice())
-                .participationCount(participationRepository.findByCampaignId(campaign.getId()).size())
+                .participationCount(participationRepository
+                        .findByCampaignId(campaign.getId())
+                        .size())
                 .progressPercent(progressPercent)
                 .nextTierLabel(nextTierLabel)
                 .build();

@@ -12,8 +12,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupBuyParticipationRepository extends JpaRepository<GroupBuyParticipation, UUID> {
     List<GroupBuyParticipation> findByCampaignId(UUID campaignId);
+
     Optional<GroupBuyParticipation> findByCampaignIdAndFarmerId(UUID campaignId, UUID farmerId);
-    
+
     @Query("SELECT SUM(p.committedQty) FROM GroupBuyParticipation p WHERE p.campaign.id = :campaignId")
     BigDecimal sumCommittedQtyByCampaignId(UUID campaignId);
 }

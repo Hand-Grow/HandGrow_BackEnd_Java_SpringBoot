@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupBuyCampaignRepository extends JpaRepository<GroupBuyCampaign, UUID> {
     Page<GroupBuyCampaign> findByCooperativeId(UUID coopId, Pageable pageable);
+
     Page<GroupBuyCampaign> findByProductEnterpriseId(UUID enterpriseId, Pageable pageable);
+
     Page<GroupBuyCampaign> findByStatus(GroupBuyCampaignStatus status, Pageable pageable);
 }
