@@ -8,7 +8,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
     ProductResponse createProduct(UUID enterpriseAccountId, CreateProductRequest request);
+
     List<ProductResponse> getProductsByEnterprise(UUID enterpriseAccountId, Pageable pageable);
+
     List<ProductResponse> getAllProducts(Pageable pageable);
+
     ProductResponse getProductById(UUID id);
 }

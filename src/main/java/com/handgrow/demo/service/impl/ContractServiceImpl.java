@@ -11,6 +11,7 @@ import com.handgrow.demo.entity.Cooperative;
 import com.handgrow.demo.entity.ElectronicContract;
 import com.handgrow.demo.entity.Enterprise;
 import com.handgrow.demo.entity.Farmer;
+import com.handgrow.demo.entity.enums.BulkSaleStatus;
 import com.handgrow.demo.entity.enums.ContractStatus;
 import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.repository.BulkSaleRepository;
@@ -21,6 +22,7 @@ import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.MongoChatMessageRepository;
 import com.handgrow.demo.repository.MongoChatRoomRepository;
 import com.handgrow.demo.service.ContractService;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -124,11 +126,22 @@ public class ContractServiceImpl implements ContractService {
                 .agreedQuantity(request.getAgreedQuantity())
                 .deliveryDate(request.getDeliveryDate())
                 .terms(terms)
-                .status(ContractStatus.DRAFT)
+                .status(ContractStatus.PENDING_ENTERPRISE_SIGNATURE) // User requested status change
                 .build();
 
         contract = contractRepository.save(contract);
         log.info("Contract saved with id={} for room={}", contract.getId(), roomId);
+
+        // 2. Update MongoChatRoom status
+        room.setStatus("CONTRACT_CREATED");
+        room.setUpdatedAt(LocalDateTime.now());
+        chatRoomRepository.save(room);
+
+        // 3. Update BulkSale status
+        if (bulkSale.getStatus() == BulkSaleStatus.OPEN) {
+            bulkSale.setStatus(BulkSaleStatus.NEGOTIATING);
+            bulkSaleRepository.save(bulkSale);
+        }
 
         return toContractResponse(contract, bulkSale, cooperative, enterprise);
     }
@@ -141,11 +154,8 @@ public class ContractServiceImpl implements ContractService {
                 .findByRoomId(roomId)
                 .orElseThrow(() -> new RuntimeException("Chưa có hợp đồng nào cho phòng chat: " + roomId));
 
-        BulkSale bulkSale = contract.getBulkSale();
-        Cooperative cooperative = contract.getCooperative();
-        Enterprise enterprise = contract.getEnterprise();
-
-        return toContractResponse(contract, bulkSale, cooperative, enterprise);
+        return toContractResponse(
+                contract, contract.getBulkSale(), contract.getCooperative(), contract.getEnterprise());
     }
 
     @Override
@@ -242,7 +252,8 @@ public class ContractServiceImpl implements ContractService {
     private ElectronicContractResponse toContractResponse(
             ElectronicContract c, BulkSale bulkSale, Cooperative cooperative, Enterprise enterprise) {
 
-        String enterpriseName = enterprise.getName() != null ? enterprise.getName() : enterprise.getCompanyName();
+        String enterpriseName =
+                enterprise.getCompanyName() != null ? enterprise.getCompanyName() : enterprise.getName();
 
         return ElectronicContractResponse.builder()
                 .id(c.getId())
@@ -251,8 +262,15 @@ public class ContractServiceImpl implements ContractService {
                 .productName(bulkSale.getProductName())
                 .cooperativeId(cooperative.getId())
                 .cooperativeName(cooperative.getName())
+                .cooperativeAddress(cooperative.getAddress())
+                .cooperativePhone(cooperative.getPhoneNumber())
+                .cooperativeRepresentative(cooperative.getRepresentativeName())
                 .enterpriseId(enterprise.getId())
                 .enterpriseName(enterpriseName)
+                .enterpriseAddress(enterprise.getAddress())
+                .enterprisePhone(enterprise.getPhoneNumber())
+                .enterpriseTaxCode(enterprise.getTaxCode())
+                .enterpriseRepresentative(enterprise.getRepresentativeName())
                 .agreedPrice(c.getAgreedPrice())
                 .agreedQuantity(c.getAgreedQuantity())
                 .deliveryDate(c.getDeliveryDate())
