@@ -193,6 +193,42 @@ public class ContractServiceImpl implements ContractService {
                 .collect(Collectors.toList());
     }
 
+    // ─── 4. Enterprise Sign Contract ─────────────────────────────────────────
+
+    @Transactional
+    @Override
+    public ElectronicContractResponse enterpriseSignContract(UUID accountId, String roomId, String signatoryName) {
+        // Verify account and enterprise ownership
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+        String role = account.getRole().getName();
+        if (!"ENTERPRISE".equals(role)) {
+            throw new RuntimeException("Only enterprise accounts can sign as enterprise");
+        }
+
+        Enterprise enterprise = enterpriseRepository
+                .findByAccount(account)
+                .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
+
+        ElectronicContract contract = contractRepository
+                .findByRoomId(roomId)
+                .orElseThrow(() -> new RuntimeException("Contract not found for room: " + roomId));
+
+        if (!contract.getEnterprise().getId().equals(enterprise.getId())) {
+            throw new RuntimeException("Enterprise mismatch: account cannot sign this contract");
+        }
+
+        contract.setEnterpriseSignatoryName(signatoryName);
+        contract.setEnterpriseSigned(true);
+        contract.setEnterpriseSignedAt(LocalDateTime.now());
+        // advance status: after enterprise signs, waiting for coop signature
+        contract.setStatus(ContractStatus.PENDING_COOP_SIGNATURE);
+
+        contract = contractRepository.save(contract);
+        return toContractResponse(
+                contract, contract.getBulkSale(), contract.getCooperative(), contract.getEnterprise());
+    }
+
     // ─── Private Helpers ─────────────────────────────────────────────────────
 
     /**
@@ -271,6 +307,9 @@ public class ContractServiceImpl implements ContractService {
                 .enterprisePhone(enterprise.getPhoneNumber())
                 .enterpriseTaxCode(enterprise.getTaxCode())
                 .enterpriseRepresentative(enterprise.getRepresentativeName())
+                .enterpriseSignatoryName(c.getEnterpriseSignatoryName())
+                .enterpriseSigned(c.getEnterpriseSigned())
+                .enterpriseSignedAt(c.getEnterpriseSignedAt())
                 .agreedPrice(c.getAgreedPrice())
                 .agreedQuantity(c.getAgreedQuantity())
                 .deliveryDate(c.getDeliveryDate())

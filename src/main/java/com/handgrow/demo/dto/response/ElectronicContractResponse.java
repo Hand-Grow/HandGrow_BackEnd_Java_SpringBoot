@@ -38,4 +38,9 @@ public class ElectronicContractResponse {
     private ContractStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Enterprise signature info
+    private String enterpriseSignatoryName;
+    private Boolean enterpriseSigned;
+    private LocalDateTime enterpriseSignedAt;
 }
