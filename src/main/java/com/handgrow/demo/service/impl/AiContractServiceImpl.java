@@ -20,7 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class AiContractServiceImpl {
 
     private static final String GEMINI_API_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
     @Value("${gemini.api.key:}")
     private String geminiApiKey;

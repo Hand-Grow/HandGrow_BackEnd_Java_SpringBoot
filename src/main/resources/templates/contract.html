@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xml:lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Hợp đồng hợp tác nông nghiệp</title>
+    <style>
+        body { font-family: 'Times New Roman', serif; padding: 40px; }
+        h1 { text-align: center; color: #2c3e50; }
+        .party { margin-bottom: 20px; font-weight: bold; }
+        .content { margin-top: 30px; line-height: 1.6; }
+        .footer { margin-top: 60px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>HỢP ĐỒNG HỢP TÁC NÔNG NGHIỆP</h1>
+
+    <div class="party">Bên A (Hợp tác xã): <span th:text="${cooperativeName}">Tên HTX</span></div>
+    <div class="party">Bên B (Doanh nghiệp): <span th:text="${enterpriseName}">Tên DN</span></div>
+
+    <div class="content">
+        <p>Hai bên thống nhất ký kết hợp đồng mua bán với nội dung sau:</p>
+        <p>- Giá trị hợp đồng: <strong th:text="${totalValue}">0 VNĐ</strong></p>
+        <p>- Điều khoản AI tự sinh: <span th:text="${aiTerms}">...</span></p>
+    </div>
+
+    <div class="footer">
+        <p>Ngày ký: <span th:text="${enterpriseSignDate}">........</span></p>
+        <p>Đại diện HTX: _____________________</p>
+        <p>Đại diện DN (Người ký): <span th:text="${enterpriseSignatoryName}">Tên người ký</span></p>
+    </div>
+</body>
+</html>
