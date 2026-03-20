@@ -32,4 +32,22 @@ public interface ContractService {
      * @return ElectronicContractResponse hoặc null nếu chưa tạo
      */
     ElectronicContractResponse getContractByRoom(String roomId);
+
+    /**
+     * Lấy danh sách hợp đồng của người dùng đang đăng nhập (HTX hoặc Doanh nghiệp).
+     *
+     * @param accountId account đang đăng nhập
+     * @return Danh sách hợp đồng
+     */
+    java.util.List<ElectronicContractResponse> getMyContracts(UUID accountId);
+
+    /**
+     * Mark enterprise as having signed the contract.
+     *
+     * @param accountId account performing the signature (enterprise account)
+     * @param roomId chat room id identifying the contract
+     * @param signatoryName human readable name of the person signing for enterprise
+     * @return updated ElectronicContractResponse
+     */
+    ElectronicContractResponse enterpriseSignContract(UUID accountId, String roomId, String signatoryName);
 }

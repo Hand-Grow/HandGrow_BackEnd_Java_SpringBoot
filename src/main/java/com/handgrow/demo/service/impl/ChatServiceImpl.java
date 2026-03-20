@@ -230,7 +230,7 @@ public class ChatServiceImpl implements ChatService {
         ChatMessageResponse response = toMessageResponse(message);
 
         try {
-            messagingTemplate.convertAndSend("/topic/room." + roomId, response);
+            messagingTemplate.convertAndSend("/topic/room/" + roomId, response);
         } catch (Exception e) {
             log.error("Failed to broadcast message to room {}", roomId, e);
         }
@@ -239,14 +239,40 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private ChatRoomResponse toChatRoomResponse(MongoChatRoom room) {
+        String entName = room.getEnterpriseName();
+        if ((entName == null || entName.isBlank()) && room.getEnterpriseId() != null) {
+            entName = enterpriseRepository
+                    .findById(UUID.fromString(room.getEnterpriseId()))
+                    .map(ent -> ent.getCompanyName() != null ? ent.getCompanyName() : ent.getName())
+                    .orElse(null);
+            // Optional: update the room document if we found the name
+            if (entName != null) {
+                room.setEnterpriseName(entName);
+                chatRoomRepository.save(room);
+            }
+        }
+
+        String coopName = room.getCooperativeName();
+        if (coopName == null && room.getCooperativeId() != null) {
+            coopName = cooperativeRepository
+                    .findById(UUID.fromString(room.getCooperativeId()))
+                    .map(Cooperative::getName)
+                    .orElse(null);
+            // Optional: update the room document if we found the name
+            if (coopName != null) {
+                room.setCooperativeName(coopName);
+                chatRoomRepository.save(room);
+            }
+        }
+
         return ChatRoomResponse.builder()
                 .id(room.getId())
                 .bulkSaleId(room.getBulkSaleId() != null ? UUID.fromString(room.getBulkSaleId()) : null)
                 .productName(room.getProductName())
                 .cooperativeId(room.getCooperativeId() != null ? UUID.fromString(room.getCooperativeId()) : null)
-                .cooperativeName(room.getCooperativeName())
+                .cooperativeName(coopName)
                 .enterpriseId(room.getEnterpriseId() != null ? UUID.fromString(room.getEnterpriseId()) : null)
-                .enterpriseName(room.getEnterpriseName())
+                .enterpriseName(entName)
                 .status(room.getStatus())
                 .createdAt(room.getCreatedAt())
                 .updatedAt(room.getUpdatedAt())

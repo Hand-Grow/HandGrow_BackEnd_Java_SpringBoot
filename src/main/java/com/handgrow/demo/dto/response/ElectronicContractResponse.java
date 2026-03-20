@@ -21,8 +21,15 @@ public class ElectronicContractResponse {
     private String productName;
     private UUID cooperativeId;
     private String cooperativeName;
+    private String cooperativeAddress;
+    private String cooperativePhone;
+    private String cooperativeRepresentative;
     private UUID enterpriseId;
     private String enterpriseName;
+    private String enterpriseAddress;
+    private String enterprisePhone;
+    private String enterpriseTaxCode;
+    private String enterpriseRepresentative;
     private BigDecimal agreedPrice;
     private BigDecimal agreedQuantity;
     private LocalDate deliveryDate;
@@ -31,4 +38,9 @@ public class ElectronicContractResponse {
     private ContractStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Enterprise signature info
+    private String enterpriseSignatoryName;
+    private Boolean enterpriseSigned;
+    private LocalDateTime enterpriseSignedAt;
 }

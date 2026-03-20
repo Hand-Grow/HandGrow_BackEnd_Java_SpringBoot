@@ -26,6 +26,7 @@ public class FeedServiceImpl implements FeedService {
     private final FeedLikeRepository likeRepository;
     private final FeedCommentRepository commentRepository;
     private final FarmerRepository farmerRepository;
+    private final BulkSaleRepository bulkSaleRepository;
 
     @Transactional
     public List<FeedItemResponse> getFeed(UUID coopId, FeedTargetType type, String username, Pageable pageable) {
@@ -77,6 +78,7 @@ public class FeedServiceImpl implements FeedService {
                                         .findByFarmerIdAndTargetIdAndTargetType(
                                                 farmerId, c.getId(), FeedTargetType.CAMPAIGN)
                                         .isPresent())
+                        .isPublished(bulkSaleRepository.existsByCampaignId(c.getId()))
                         .createdAt(c.getCreatedAt())
                         .build());
             }

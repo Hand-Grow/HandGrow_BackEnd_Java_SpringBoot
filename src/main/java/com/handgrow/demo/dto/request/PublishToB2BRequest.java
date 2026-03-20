@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PublishToB2BRequest {
     private BigDecimal expectedPrice;
+    private java.util.List<String> attachments;
 }

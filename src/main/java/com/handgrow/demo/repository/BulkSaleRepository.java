@@ -13,4 +13,6 @@ public interface BulkSaleRepository extends JpaRepository<BulkSale, UUID> {
     List<BulkSale> findByStatus(BulkSaleStatus status, Pageable pageable);
 
     List<BulkSale> findByCooperativeId(UUID coopId);
+
+    boolean existsByCampaignId(UUID campaignId);
 }

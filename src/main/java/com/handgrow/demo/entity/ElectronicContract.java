@@ -4,7 +4,9 @@ import com.handgrow.demo.entity.enums.ContractStatus;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "electronic_contracts")
@@ -41,6 +43,17 @@ public class ElectronicContract extends BaseEntity {
 
     @Column(name = "terms", columnDefinition = "TEXT")
     private String terms;
+
+    // Enterprise signature fields
+    @Column(name = "enterprise_signatory_name", length = 255)
+    private String enterpriseSignatoryName;
+
+    @Column(name = "enterprise_signed")
+    @ColumnDefault("false")
+    private Boolean enterpriseSigned = false;
+
+    @Column(name = "enterprise_signed_at")
+    private LocalDateTime enterpriseSignedAt;
 
     @Column(name = "document_url", length = 500)
     private String documentUrl;

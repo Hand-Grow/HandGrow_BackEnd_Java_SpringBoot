@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateBulkSaleRequest {
-    private BigDecimal expectedPrice;
-    private java.util.List<String> attachments;
+public class JoinGroupBuyRequest {
+    private BigDecimal committedQty;
 }

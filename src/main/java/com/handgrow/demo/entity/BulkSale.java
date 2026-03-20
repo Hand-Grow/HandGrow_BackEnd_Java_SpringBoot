@@ -35,4 +35,9 @@ public class BulkSale extends BaseEntity {
     @Column(name = "status")
     @Builder.Default
     private BulkSaleStatus status = BulkSaleStatus.OPEN;
+
+    @Column(name = "attachments", columnDefinition = "jsonb")
+    @Convert(converter = com.handgrow.demo.util.StringListConverter.class)
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
+    private java.util.List<String> attachments;
 }

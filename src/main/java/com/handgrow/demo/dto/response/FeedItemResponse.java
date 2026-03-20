@@ -25,5 +25,6 @@ public class FeedItemResponse {
     private long likeCount;
     private long commentCount;
     private boolean isLiked;
+    private boolean isPublished;
     private LocalDateTime createdAt;
 }

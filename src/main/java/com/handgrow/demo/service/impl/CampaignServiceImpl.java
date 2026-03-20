@@ -113,6 +113,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .productName(campaign.getProductName())
                 .totalQuantity(totalQuantity)
                 .expectedPrice(request.getExpectedPrice())
+                .attachments(request.getAttachments())
                 .status(BulkSaleStatus.OPEN)
                 .build());
 

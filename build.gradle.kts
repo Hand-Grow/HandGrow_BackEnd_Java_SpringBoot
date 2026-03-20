@@ -44,8 +44,8 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    // Redis cache
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    // Redis cache (disabled - not used in this project)
+    // implementation("org.springframework.boot:spring-boot-starter-data-redis")
     // OpenApi
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 	// Junit + Mockito
@@ -59,6 +59,12 @@ dependencies {
 	implementation("software.amazon.awssdk:s3:2.25.11")
 	// WebFlux — needed for WebClient to call Gemini HTTP API
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	// Công cụ Template Engine mặc định của Spring Boot
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+	// Thư viện Convert HTML sang PDF cực xịn (hỗ trợ CSS3 tốt)
+//	implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.1.24")
+	implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
 }
 
 tasks.withType<Test> {

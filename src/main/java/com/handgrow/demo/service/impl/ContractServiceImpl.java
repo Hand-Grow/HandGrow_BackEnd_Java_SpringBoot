@@ -5,29 +5,36 @@ import com.handgrow.demo.document.MongoChatRoom;
 import com.handgrow.demo.dto.request.CreateContractRequest;
 import com.handgrow.demo.dto.response.DraftContractResponse;
 import com.handgrow.demo.dto.response.ElectronicContractResponse;
+import com.handgrow.demo.entity.Account;
 import com.handgrow.demo.entity.BulkSale;
 import com.handgrow.demo.entity.Cooperative;
 import com.handgrow.demo.entity.ElectronicContract;
 import com.handgrow.demo.entity.Enterprise;
+import com.handgrow.demo.entity.Farmer;
+import com.handgrow.demo.entity.enums.BulkSaleStatus;
 import com.handgrow.demo.entity.enums.ContractStatus;
+import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.repository.BulkSaleRepository;
 import com.handgrow.demo.repository.CooperativeRepository;
 import com.handgrow.demo.repository.ElectronicContractRepository;
 import com.handgrow.demo.repository.EnterpriseRepository;
+import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.MongoChatMessageRepository;
 import com.handgrow.demo.repository.MongoChatRoomRepository;
 import com.handgrow.demo.service.ContractService;
-import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ContractServiceImpl implements ContractService {
 
     private final MongoChatRoomRepository chatRoomRepository;
@@ -36,6 +43,8 @@ public class ContractServiceImpl implements ContractService {
     private final CooperativeRepository cooperativeRepository;
     private final EnterpriseRepository enterpriseRepository;
     private final ElectronicContractRepository contractRepository;
+    private final AccountRepository accountRepository;
+    private final FarmerRepository farmerRepository;
     private final AiContractServiceImpl aiContractService;
 
     // ─── 1. AI Draft ────────────────────────────────────────────────────────
@@ -117,11 +126,22 @@ public class ContractServiceImpl implements ContractService {
                 .agreedQuantity(request.getAgreedQuantity())
                 .deliveryDate(request.getDeliveryDate())
                 .terms(terms)
-                .status(ContractStatus.DRAFT)
+                .status(ContractStatus.PENDING_ENTERPRISE_SIGNATURE) // User requested status change
                 .build();
 
         contract = contractRepository.save(contract);
         log.info("Contract saved with id={} for room={}", contract.getId(), roomId);
+
+        // 2. Update MongoChatRoom status
+        room.setStatus("CONTRACT_CREATED");
+        room.setUpdatedAt(LocalDateTime.now());
+        chatRoomRepository.save(room);
+
+        // 3. Update BulkSale status
+        if (bulkSale.getStatus() == BulkSaleStatus.OPEN) {
+            bulkSale.setStatus(BulkSaleStatus.NEGOTIATING);
+            bulkSaleRepository.save(bulkSale);
+        }
 
         return toContractResponse(contract, bulkSale, cooperative, enterprise);
     }
@@ -134,11 +154,79 @@ public class ContractServiceImpl implements ContractService {
                 .findByRoomId(roomId)
                 .orElseThrow(() -> new RuntimeException("Chưa có hợp đồng nào cho phòng chat: " + roomId));
 
-        BulkSale bulkSale = contract.getBulkSale();
-        Cooperative cooperative = contract.getCooperative();
-        Enterprise enterprise = contract.getEnterprise();
+        return toContractResponse(
+                contract, contract.getBulkSale(), contract.getCooperative(), contract.getEnterprise());
+    }
 
-        return toContractResponse(contract, bulkSale, cooperative, enterprise);
+    @Override
+    public List<ElectronicContractResponse> getMyContracts(UUID accountId) {
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+        String role = account.getRole().getName();
+
+        List<ElectronicContract> contracts;
+        if (role.equals("ENTERPRISE")) {
+            Enterprise enterprise = enterpriseRepository
+                    .findByAccount(account)
+                    .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+            contracts = contractRepository.findByEnterpriseIdOrderByCreatedAtDesc(enterprise.getId());
+        } else if (role.equals("COOP")
+                || role.equals("COOPERATIVE")
+                || role.equals("ROLE_COOP")
+                || role.equals("ROLE_COOPERATIVE")) {
+            Cooperative cooperative = cooperativeRepository
+                    .findByAccount(account)
+                    .orElseThrow(() -> new RuntimeException("Cooperative config not found"));
+            contracts = contractRepository.findByCooperativeIdOrderByCreatedAtDesc(cooperative.getId());
+        } else if (role.equals("FARMER")) {
+            Farmer farmer = farmerRepository
+                    .findByAccount(account)
+                    .orElseThrow(() -> new RuntimeException("Farmer config not found"));
+            contracts = contractRepository.findByCooperativeIdOrderByCreatedAtDesc(
+                    farmer.getCooperative().getId());
+        } else {
+            return List.of();
+        }
+
+        return contracts.stream()
+                .map(c -> toContractResponse(c, c.getBulkSale(), c.getCooperative(), c.getEnterprise()))
+                .collect(Collectors.toList());
+    }
+
+    // ─── 4. Enterprise Sign Contract ─────────────────────────────────────────
+
+    @Transactional
+    @Override
+    public ElectronicContractResponse enterpriseSignContract(UUID accountId, String roomId, String signatoryName) {
+        // Verify account and enterprise ownership
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+        String role = account.getRole().getName();
+        if (!"ENTERPRISE".equals(role)) {
+            throw new RuntimeException("Only enterprise accounts can sign as enterprise");
+        }
+
+        Enterprise enterprise = enterpriseRepository
+                .findByAccount(account)
+                .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
+
+        ElectronicContract contract = contractRepository
+                .findByRoomId(roomId)
+                .orElseThrow(() -> new RuntimeException("Contract not found for room: " + roomId));
+
+        if (!contract.getEnterprise().getId().equals(enterprise.getId())) {
+            throw new RuntimeException("Enterprise mismatch: account cannot sign this contract");
+        }
+
+        contract.setEnterpriseSignatoryName(signatoryName);
+        contract.setEnterpriseSigned(true);
+        contract.setEnterpriseSignedAt(LocalDateTime.now());
+        // advance status: after enterprise signs, waiting for coop signature
+        contract.setStatus(ContractStatus.PENDING_COOP_SIGNATURE);
+
+        contract = contractRepository.save(contract);
+        return toContractResponse(
+                contract, contract.getBulkSale(), contract.getCooperative(), contract.getEnterprise());
     }
 
     // ─── Private Helpers ─────────────────────────────────────────────────────
@@ -200,7 +288,8 @@ public class ContractServiceImpl implements ContractService {
     private ElectronicContractResponse toContractResponse(
             ElectronicContract c, BulkSale bulkSale, Cooperative cooperative, Enterprise enterprise) {
 
-        String enterpriseName = enterprise.getName() != null ? enterprise.getName() : enterprise.getCompanyName();
+        String enterpriseName =
+                enterprise.getCompanyName() != null ? enterprise.getCompanyName() : enterprise.getName();
 
         return ElectronicContractResponse.builder()
                 .id(c.getId())
@@ -209,8 +298,18 @@ public class ContractServiceImpl implements ContractService {
                 .productName(bulkSale.getProductName())
                 .cooperativeId(cooperative.getId())
                 .cooperativeName(cooperative.getName())
+                .cooperativeAddress(cooperative.getAddress())
+                .cooperativePhone(cooperative.getPhoneNumber())
+                .cooperativeRepresentative(cooperative.getRepresentativeName())
                 .enterpriseId(enterprise.getId())
                 .enterpriseName(enterpriseName)
+                .enterpriseAddress(enterprise.getAddress())
+                .enterprisePhone(enterprise.getPhoneNumber())
+                .enterpriseTaxCode(enterprise.getTaxCode())
+                .enterpriseRepresentative(enterprise.getRepresentativeName())
+                .enterpriseSignatoryName(c.getEnterpriseSignatoryName())
+                .enterpriseSigned(c.getEnterpriseSigned())
+                .enterpriseSignedAt(c.getEnterpriseSignedAt())
                 .agreedPrice(c.getAgreedPrice())
                 .agreedQuantity(c.getAgreedQuantity())
                 .deliveryDate(c.getDeliveryDate())
