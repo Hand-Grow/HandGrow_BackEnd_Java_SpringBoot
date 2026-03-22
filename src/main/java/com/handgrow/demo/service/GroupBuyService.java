@@ -5,6 +5,7 @@ import com.handgrow.demo.dto.request.JoinGroupBuyRequest;
 import com.handgrow.demo.dto.response.GroupBuyCampaignResponse;
 import com.handgrow.demo.dto.response.GroupBuyParticipationResponse;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 
@@ -22,4 +23,6 @@ public interface GroupBuyService {
     GroupBuyCampaignResponse closeCampaign(UUID campaignId, UUID coopAccountId);
 
     List<GroupBuyParticipationResponse> getParticipationsByCampaign(UUID campaignId);
+
+    Optional<GroupBuyParticipationResponse> getParticipationByCampaignAndFarmer(UUID campaignId, UUID farmerAccountId);
 }

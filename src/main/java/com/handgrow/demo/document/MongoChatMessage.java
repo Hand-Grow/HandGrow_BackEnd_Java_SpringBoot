@@ -33,6 +33,9 @@ public class MongoChatMessage {
     @Field("sender_name")
     private String senderName;
 
+    @Field("sender_avatar_url")
+    private String senderAvatarUrl;
+
     @Field("content")
     private String content;
 

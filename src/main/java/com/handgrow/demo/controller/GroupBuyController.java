@@ -65,4 +65,13 @@ public class GroupBuyController {
     public ResponseEntity<List<GroupBuyParticipationResponse>> getParticipations(@PathVariable UUID id) {
         return ResponseEntity.ok(groupBuyService.getParticipationsByCampaign(id));
     }
+
+    @GetMapping("/campaigns/{id}/participations/me")
+    public ResponseEntity<GroupBuyParticipationResponse> getMyParticipation(
+            @PathVariable UUID id, Principal principal) {
+        return groupBuyService
+                .getParticipationByCampaignAndFarmer(id, getAccountId(principal))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
 }

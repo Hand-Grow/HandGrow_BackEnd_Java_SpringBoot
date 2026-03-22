@@ -44,6 +44,9 @@ public class Enterprise extends BaseEntity {
     @Column(length = 100)
     private String name;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Column(name = "representative_name")
     private String representativeName;
 }

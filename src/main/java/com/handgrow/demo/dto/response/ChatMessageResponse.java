@@ -16,6 +16,7 @@ public class ChatMessageResponse {
     private UUID senderId;
     private String senderType;
     private String senderName; // Name of Coop or Enterprise
+    private String senderAvatarUrl; // optional avatar URL to show in UI
     private String content;
     private LocalDateTime createdAt;
 }
