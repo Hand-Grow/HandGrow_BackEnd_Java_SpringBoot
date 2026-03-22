@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -171,6 +172,19 @@ public class GroupBuyServiceImpl implements GroupBuyService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<GroupBuyParticipationResponse> getParticipationByCampaignAndFarmer(
+            UUID campaignId, UUID farmerAccountId) {
+        Farmer farmer = farmerRepository
+                .findByAccountId(farmerAccountId)
+                .orElseThrow(() -> new RuntimeException("Farmer not found"));
+
+        return participationRepository
+                .findByCampaignIdAndFarmerId(campaignId, farmer.getId())
+                .map(this::mapParticipationToResponse);
+    }
+
     private void updateCampaignStatus(GroupBuyCampaign campaign) {
         BigDecimal totalQty = participationRepository.sumCommittedQtyByCampaignId(campaign.getId());
         if (totalQty == null) totalQty = BigDecimal.ZERO;
@@ -253,6 +267,17 @@ public class GroupBuyServiceImpl implements GroupBuyService {
                         .size())
                 .progressPercent(progressPercent)
                 .nextTierLabel(nextTierLabel)
+                .build();
+    }
+
+    private GroupBuyParticipationResponse mapParticipationToResponse(GroupBuyParticipation p) {
+        return GroupBuyParticipationResponse.builder()
+                .id(p.getId())
+                .farmerId(p.getFarmer().getId())
+                .farmerName(p.getFarmer().getFullName())
+                .committedQty(p.getCommittedQty())
+                .lockedUnitPrice(p.getLockedUnitPrice())
+                .totalAmount(p.getTotalAmount())
                 .build();
     }
 }

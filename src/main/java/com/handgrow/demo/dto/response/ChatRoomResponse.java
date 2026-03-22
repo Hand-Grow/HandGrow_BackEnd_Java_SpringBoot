@@ -17,8 +17,10 @@ public class ChatRoomResponse {
     private String productName;
     private UUID cooperativeId;
     private String cooperativeName;
+    private String cooperativeAvatarUrl; // optional avatar of coop
     private UUID enterpriseId;
     private String enterpriseName;
+    private String enterpriseAvatarUrl; // optional avatar of enterprise
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

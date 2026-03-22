@@ -18,16 +18,15 @@ public interface SourcingRequestRepository extends JpaRepository<SourcingRequest
 
     Page<SourcingRequest> findByEnterpriseId(UUID enterpriseId, Pageable pageable);
 
-    @Query("SELECT sr FROM SourcingRequest sr WHERE " +
-           "(:productName IS NULL OR LOWER(sr.productName) LIKE LOWER(CONCAT('%', :productName, '%'))) AND " +
-           "(:status IS NULL OR sr.status = :status)")
+    @Query("SELECT sr FROM SourcingRequest sr WHERE "
+            + "(:productName IS NULL OR LOWER(sr.productName) LIKE LOWER(CONCAT('%', :productName, '%'))) AND "
+            + "(:status IS NULL OR sr.status = :status)")
     Page<SourcingRequest> searchSourcingRequests(
-            @Param("productName") String productName,
-            @Param("status") SourcingRequestStatus status,
-            Pageable pageable);
+            @Param("productName") String productName, @Param("status") SourcingRequestStatus status, Pageable pageable);
 
     List<SourcingRequest> findByEnterpriseIdAndStatus(UUID enterpriseId, SourcingRequestStatus status);
 
-    @Query("SELECT sr FROM SourcingRequest sr WHERE sr.deadline < CURRENT_DATE AND sr.status IN ('OPEN', 'IN_PROGRESS')")
+    @Query(
+            "SELECT sr FROM SourcingRequest sr WHERE sr.deadline < CURRENT_DATE AND sr.status IN ('OPEN', 'IN_PROGRESS')")
     List<SourcingRequest> findExpiredRequests();
 }

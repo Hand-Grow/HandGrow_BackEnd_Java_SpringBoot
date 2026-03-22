@@ -13,6 +13,7 @@ public class JoinRequestResponse {
     private String id;
     private String farmerName;
     private String farmerPhone;
+    private String farmerAddress;
     private String cooperativeName;
     private String cooperativeId;
     private String status;
