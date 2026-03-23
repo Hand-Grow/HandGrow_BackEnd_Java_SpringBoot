@@ -15,4 +15,6 @@ public interface GroupBuyCampaignRepository extends JpaRepository<GroupBuyCampai
     Page<GroupBuyCampaign> findByProductEnterpriseId(UUID enterpriseId, Pageable pageable);
 
     Page<GroupBuyCampaign> findByStatus(GroupBuyCampaignStatus status, Pageable pageable);
+
+    Page<GroupBuyCampaign> findByCooperativeIdAndStatus(UUID coopId, GroupBuyCampaignStatus status, Pageable pageable);
 }

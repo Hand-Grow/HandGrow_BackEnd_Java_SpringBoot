@@ -36,8 +36,8 @@ public class GroupBuyController {
     }
 
     @GetMapping("/campaigns")
-    public ResponseEntity<List<GroupBuyCampaignResponse>> getAllCampaigns(Pageable pageable) {
-        return ResponseEntity.ok(groupBuyService.getAllGatheringCampaigns(pageable));
+    public ResponseEntity<List<GroupBuyCampaignResponse>> getAllCampaigns(Principal principal, Pageable pageable) {
+        return ResponseEntity.ok(groupBuyService.getAllGatheringCampaigns(getAccountId(principal), pageable));
     }
 
     @GetMapping("/campaigns/cooperative/me")

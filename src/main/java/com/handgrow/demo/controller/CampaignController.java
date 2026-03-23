@@ -45,8 +45,9 @@ public class CampaignController {
     }
 
     @GetMapping("/campaigns/{id}/commitments")
-    public ResponseEntity<List<CommitmentResponse>> getCommitments(@PathVariable UUID id, Pageable pageable) {
-        return ResponseEntity.ok(campaignService.getCommitments(id, pageable));
+    public ResponseEntity<List<CommitmentResponse>> getCommitments(
+            @PathVariable UUID id, Principal principal, Pageable pageable) {
+        return ResponseEntity.ok(campaignService.getCommitments(id, principal.getName(), pageable));
     }
 
     @PostMapping("/campaigns/{id}/publish-to-b2b")

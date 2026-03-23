@@ -85,6 +85,7 @@ application:
 # ===============================
 server:
   port: ${PORT:8080}
+  forward-headers-strategy: ${FORWARD_HEADERS_STRATEGY:framework}
 
 # ===============================
 # 6. MANAGEMENT CONFIGURATION

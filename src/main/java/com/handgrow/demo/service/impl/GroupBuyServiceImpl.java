@@ -30,6 +30,7 @@ public class GroupBuyServiceImpl implements GroupBuyService {
     private final CooperativeRepository cooperativeRepository;
     private final FarmerRepository farmerRepository;
     private final GroupBuyOrderRepository orderRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     @Transactional
@@ -69,10 +70,32 @@ public class GroupBuyServiceImpl implements GroupBuyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GroupBuyCampaignResponse> getAllGatheringCampaigns(Pageable pageable) {
-        return campaignRepository.findByStatus(GroupBuyCampaignStatus.GATHERING, pageable).stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public List<GroupBuyCampaignResponse> getAllGatheringCampaigns(UUID accountId, Pageable pageable) {
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+
+        String roleName = account.getRole().getName();
+
+        if ("FARMER".equals(roleName)) {
+            return farmerRepository
+                    .findByAccountId(accountId)
+                    .map(Farmer::getCooperative)
+                    .map(coop -> campaignRepository.findByCooperativeIdAndStatus(
+                            coop.getId(), GroupBuyCampaignStatus.GATHERING, pageable))
+                    .map(page -> page.stream().map(this::mapToResponse).collect(Collectors.toList()))
+                    .orElse(List.of());
+        } else if ("COOP".equals(roleName)) {
+            return cooperativeRepository
+                    .findByAccountId(accountId)
+                    .map(coop -> campaignRepository.findByCooperativeIdAndStatus(
+                            coop.getId(), GroupBuyCampaignStatus.GATHERING, pageable))
+                    .map(page -> page.stream().map(this::mapToResponse).collect(Collectors.toList()))
+                    .orElse(List.of());
+        } else {
+            return campaignRepository.findByStatus(GroupBuyCampaignStatus.GATHERING, pageable).stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override

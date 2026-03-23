@@ -14,7 +14,7 @@ public interface GroupBuyService {
 
     List<GroupBuyCampaignResponse> getCampaignsByCooperative(UUID coopAccountId, Pageable pageable);
 
-    List<GroupBuyCampaignResponse> getAllGatheringCampaigns(Pageable pageable);
+    List<GroupBuyCampaignResponse> getAllGatheringCampaigns(UUID accountId, Pageable pageable);
 
     GroupBuyCampaignResponse getCampaignById(UUID id);
 
