@@ -7,7 +7,6 @@ import com.handgrow.demo.entity.*;
 import com.handgrow.demo.entity.enums.FeedTargetType;
 import com.handgrow.demo.repository.*;
 import com.handgrow.demo.service.FeedService;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

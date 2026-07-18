@@ -5,7 +5,7 @@ import com.handgrow.demo.dto.response.DiaryResponse;
 import com.handgrow.demo.dto.response.ProfitResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.dto.response.VoiceDiaryResponse;
-import com.handgrow.demo.service.impl.VoiceDiaryService;
+import com.handgrow.demo.service.VoiceDiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

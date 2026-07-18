@@ -16,7 +16,7 @@ import com.handgrow.demo.entity.enums.ActivityType;
 import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.FarmingDiaryRepository;
 import com.handgrow.demo.repository.PlotRepository;
-import jakarta.transaction.Transactional;
+import com.handgrow.demo.service.VoiceDiaryService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Base64;
@@ -37,13 +37,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
-public class VoiceDiaryService {
+public class VoiceDiaryServiceImpl implements VoiceDiaryService {
 
     @Value("${gemini.api.key}")
     private String geminiApiKey;

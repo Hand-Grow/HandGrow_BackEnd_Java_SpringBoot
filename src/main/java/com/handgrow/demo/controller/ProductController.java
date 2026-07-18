@@ -2,8 +2,9 @@ package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.CreateProductRequest;
 import com.handgrow.demo.dto.response.ProductResponse;
-import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.service.ProductService;
+import com.handgrow.demo.util.SecurityUtils;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -18,18 +19,14 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     private final ProductService productService;
-    private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Account not found"))
-                .getId();
+        return SecurityUtils.extractAccountId((org.springframework.security.core.Authentication) principal);
     }
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(
-            @RequestBody CreateProductRequest request, Principal principal) {
+            @Valid @RequestBody CreateProductRequest request, Principal principal) {
         return ResponseEntity.ok(productService.createProduct(getAccountId(principal), request));
     }
 

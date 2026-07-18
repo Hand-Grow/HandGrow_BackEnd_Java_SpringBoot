@@ -9,7 +9,6 @@ import com.handgrow.demo.dto.response.ChatRoomResponse;
 import com.handgrow.demo.entity.*;
 import com.handgrow.demo.repository.*;
 import com.handgrow.demo.service.ChatService;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

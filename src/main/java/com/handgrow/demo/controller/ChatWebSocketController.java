@@ -4,8 +4,8 @@ import com.handgrow.demo.dto.request.CreateChatRoomRequest;
 import com.handgrow.demo.dto.request.SendChatMessageRequest;
 import com.handgrow.demo.dto.response.ChatMessageResponse;
 import com.handgrow.demo.dto.response.ChatRoomResponse;
-import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.service.ChatService;
+import com.handgrow.demo.util.SecurityUtils;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -23,13 +23,9 @@ import org.springframework.web.bind.annotation.*;
 public class ChatWebSocketController {
 
     private final ChatService chatService;
-    private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Account not found"))
-                .getId();
+        return SecurityUtils.extractAccountId((org.springframework.security.core.Authentication) principal);
     }
 
     /**

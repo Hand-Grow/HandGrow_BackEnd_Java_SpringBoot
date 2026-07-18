@@ -4,8 +4,8 @@ import com.handgrow.demo.dto.request.CreateGroupBuyCampaignRequest;
 import com.handgrow.demo.dto.request.JoinGroupBuyRequest;
 import com.handgrow.demo.dto.response.GroupBuyCampaignResponse;
 import com.handgrow.demo.dto.response.GroupBuyParticipationResponse;
-import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.service.GroupBuyService;
+import com.handgrow.demo.util.SecurityUtils;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +20,9 @@ import org.springframework.web.bind.annotation.*;
 public class GroupBuyController {
 
     private final GroupBuyService groupBuyService;
-    private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Account not found"))
-                .getId();
+        return SecurityUtils.extractAccountId((org.springframework.security.core.Authentication) principal);
     }
 
     @PostMapping("/campaigns")

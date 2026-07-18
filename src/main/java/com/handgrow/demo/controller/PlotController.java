@@ -2,7 +2,7 @@ package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.CreatePlotRequest;
 import com.handgrow.demo.dto.response.PlotResponse;
-import com.handgrow.demo.service.impl.PlotService;
+import com.handgrow.demo.service.PlotService;
 import io.swagger.v3.oas.annotations.Operation;
 import java.security.Principal;
 import java.util.List;
