@@ -1,23 +1,30 @@
 package com.handgrow.demo.controller;
 
-import com.handgrow.demo.dto.response.PresignedUrlResponse;
-import com.handgrow.demo.service.S3Service;
+import com.handgrow.demo.service.FileUploadService;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
 public class FileUploadController {
 
-    private final S3Service s3Service;
+    private final FileUploadService fileUploadService;
 
-    // Ví dụ: GET /api/v1/files/presigned-url?filename=cay_lua.jpg&contentType=image/jpeg
-    @GetMapping("/presigned-url")
-    public ResponseEntity<PresignedUrlResponse> getPresignedUrl(
-            @RequestParam String filename, @RequestParam String contentType) {
-
-        return ResponseEntity.ok(s3Service.generatePresignedUrl(filename, contentType));
+    @PostMapping("/upload")
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            String url = fileUploadService.uploadFile(file);
+            Map<String, String> response = new HashMap<>();
+            response.put("url", url);
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 }

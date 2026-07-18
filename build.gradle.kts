@@ -58,8 +58,8 @@ dependencies {
 	// Test dependency
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
-	// AWS S3 dependency
-	implementation("software.amazon.awssdk:s3:2.25.11")
+	// Cloudinary dependency
+	implementation("com.cloudinary:cloudinary-http44:1.36.0")
 	// WebFlux — needed for WebClient to call Gemini HTTP API
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 
