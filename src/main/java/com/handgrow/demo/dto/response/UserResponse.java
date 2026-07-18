@@ -22,4 +22,5 @@ public class UserResponse {
     private String produce;
     private String cooperativeId; // ID của HTX mà farmer thuộc về
     private String cooperativeName; // Tên HTX
+    private String representativeName; // Tên người đại diện
 }

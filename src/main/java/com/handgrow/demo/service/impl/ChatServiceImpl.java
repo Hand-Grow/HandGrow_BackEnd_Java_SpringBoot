@@ -219,6 +219,7 @@ public class ChatServiceImpl implements ChatService {
                 .senderId(accountId)
                 .senderType(request.getSenderType())
                 .senderName(senderName)
+                .senderAvatarUrl(determineAvatarUrlForSender(request.getSenderType(), accountId, room))
                 .content(request.getContent())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -265,14 +266,33 @@ public class ChatServiceImpl implements ChatService {
             }
         }
 
+        // Fetch avatars for coop / enterprise if present
+        String coopAvatar = null;
+        if (room.getCooperativeId() != null) {
+            coopAvatar = cooperativeRepository
+                    .findById(UUID.fromString(room.getCooperativeId()))
+                    .map(Cooperative::getAvatarUrl)
+                    .orElse(null);
+        }
+
+        String entAvatar = null;
+        if (room.getEnterpriseId() != null) {
+            entAvatar = enterpriseRepository
+                    .findById(UUID.fromString(room.getEnterpriseId()))
+                    .map(Enterprise::getAvatarUrl)
+                    .orElse(null);
+        }
+
         return ChatRoomResponse.builder()
                 .id(room.getId())
                 .bulkSaleId(room.getBulkSaleId() != null ? UUID.fromString(room.getBulkSaleId()) : null)
                 .productName(room.getProductName())
                 .cooperativeId(room.getCooperativeId() != null ? UUID.fromString(room.getCooperativeId()) : null)
                 .cooperativeName(coopName)
+                .cooperativeAvatarUrl(coopAvatar)
                 .enterpriseId(room.getEnterpriseId() != null ? UUID.fromString(room.getEnterpriseId()) : null)
                 .enterpriseName(entName)
+                .enterpriseAvatarUrl(entAvatar)
                 .status(room.getStatus())
                 .createdAt(room.getCreatedAt())
                 .updatedAt(room.getUpdatedAt())
@@ -285,8 +305,49 @@ public class ChatServiceImpl implements ChatService {
                 .senderId(m.getSenderId())
                 .senderType(m.getSenderType())
                 .senderName(m.getSenderName())
+                .senderAvatarUrl(m.getSenderAvatarUrl())
                 .content(m.getContent())
                 .createdAt(m.getCreatedAt())
                 .build();
+    }
+
+    private String determineAvatarUrlForSender(String senderType, UUID senderAccountId, MongoChatRoom room) {
+        try {
+            if ("ENTERPRISE".equals(senderType)) {
+                if (room.getEnterpriseId() != null) {
+                    return enterpriseRepository
+                            .findById(UUID.fromString(room.getEnterpriseId()))
+                            .map(Enterprise::getAvatarUrl)
+                            .orElse(null);
+                }
+                // fallback: try to find enterprise by account id
+                return enterpriseRepository
+                        .findByAccountId(senderAccountId)
+                        .map(Enterprise::getAvatarUrl)
+                        .orElse(null);
+            } else if ("COOPERATIVE".equals(senderType) || "COOP".equals(senderType)) {
+                if (room.getCooperativeId() != null) {
+                    return cooperativeRepository
+                            .findById(UUID.fromString(room.getCooperativeId()))
+                            .map(Cooperative::getAvatarUrl)
+                            .orElse(null);
+                }
+                return cooperativeRepository
+                        .findByAccountId(senderAccountId)
+                        .map(Cooperative::getAvatarUrl)
+                        .orElse(null);
+            } else if ("FARMER".equals(senderType)) {
+                return farmerRepository
+                        .findByAccountId(senderAccountId)
+                        .map(Farmer::getAvatarUrl)
+                        .orElse(null);
+            } else {
+                // Could also attempt to read from Account.profile but keep it simple
+                return null;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to determine avatar URL for sender {}: {}", senderAccountId, e.getMessage());
+            return null;
+        }
     }
 }

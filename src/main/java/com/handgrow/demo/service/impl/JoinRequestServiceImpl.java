@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -41,12 +43,21 @@ public class JoinRequestServiceImpl implements JoinRequestService {
         // Check if farmer already has pending request
         if (joinRequestRepository.existsByFarmerAndCooperativeAndStatus(
                 farmer, cooperative, JoinRequestStatus.PENDING)) {
-            throw new RuntimeException("You already have a pending request to this cooperative");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "You already have a pending request to this cooperative");
         }
 
         // Check if farmer is already member
-        if (farmer.getCooperative() != null && farmer.getCooperative().equals(cooperative)) {
-            throw new RuntimeException("You are already a member of this cooperative");
+        if (farmer.getCooperative() != null) {
+            // If farmer already belongs to the same cooperative -> duplicate
+            if (farmer.getCooperative().equals(cooperative)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "You are already a member of this cooperative");
+            }
+            // Farmer belongs to a different cooperative -> block creating new request
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "You already belong to another cooperative. Leave it before joining a new one.");
         }
 
         JoinRequest joinRequest = JoinRequest.builder()
@@ -91,6 +102,11 @@ public class JoinRequestServiceImpl implements JoinRequestService {
         // If approved, add farmer to cooperative
         if (response.isApproved()) {
             Farmer farmer = joinRequest.getFarmer();
+            // Double-check farmer isn't already a member of a different cooperative
+            if (farmer.getCooperative() != null && !farmer.getCooperative().equals(cooperative)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Farmer already belongs to another cooperative");
+            }
             farmer.setCooperative(cooperative);
             farmerRepository.save(farmer);
         }
@@ -121,6 +137,7 @@ public class JoinRequestServiceImpl implements JoinRequestService {
                 .id(joinRequest.getId().toString())
                 .farmerName(joinRequest.getFarmer().getFullName())
                 .farmerPhone(joinRequest.getFarmer().getPhoneNumber())
+                .farmerAddress(joinRequest.getFarmer().getProvince())
                 .cooperativeName(joinRequest.getCooperative().getName())
                 .cooperativeId(joinRequest.getCooperative().getId().toString())
                 .status(joinRequest.getStatus().name())

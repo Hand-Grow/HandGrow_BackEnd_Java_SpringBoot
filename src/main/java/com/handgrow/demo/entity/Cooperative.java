@@ -44,6 +44,9 @@ public class Cooperative extends BaseEntity {
     @Column(name = "fund_balance", precision = 15, scale = 2)
     private BigDecimal fundBalance;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @OneToMany(mappedBy = "cooperative", fetch = FetchType.LAZY)
     private List<Farmer> members;
 }
