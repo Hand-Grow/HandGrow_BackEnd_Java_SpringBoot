@@ -28,7 +28,10 @@ public class CreateSourcingRequest {
     private Double quantity;
 
     @NotBlank(message = "Unit is required")
-    @Schema(description = "Unit of measurement", example = "kg", allowableValues = {"kg", "tấn"})
+    @Schema(
+            description = "Unit of measurement",
+            example = "kg",
+            allowableValues = {"kg", "tấn"})
     private String unit;
 
     @Schema(description = "Expected price in VND", example = "50000")

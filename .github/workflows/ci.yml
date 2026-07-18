@@ -1,4 +1,4 @@
-name: Build, Push Image & Deploy to Render
+name: Deploy HandGrow Backend to AWS ECS Fargate
 
 on:
   push:
@@ -6,30 +6,53 @@ on:
   pull_request:
     branches: [ "release" ]
 
+env:
+  AWS_REGION: ap-southeast-1            
+  ECR_REPOSITORY: handgrow-backend      
+  ECS_CLUSTER: earnest-koala-7uh4h7        
+  ECS_SERVICE: handgrow-backend-task-service-jwrr11kn     
+
 jobs:
   build_push_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      # 1. Xác thực danh tính với AWS bằng tài khoản IAM dành riêng cho CI/CD
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            mikazuki2106/handgrow-backend:latest
-            mikazuki2106/handgrow-backend:${{ github.sha }}
+      # 2. Mở cửa kho ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
+      # 3. Đóng gói code Spring Boot thành Docker Image và đẩy lên ECR
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }} # Dùng mã commit làm tag để dễ dàng rollback khi cần
+        run: |
+          echo "Bắt đầu build Docker Image..."
+          # Đánh 2 tag: một tag 'latest' và một tag theo mã commit
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          
+          echo "Bắt đầu đẩy Image lên AWS ECR..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags
 
-      - name: Trigger Render Deploy
+      # 4. Ra lệnh cho AWS Fargate tự động kéo Image mới về và cập nhật hệ thống
+      - name: Force new deployment on ECS Fargate
         if: github.ref == 'refs/heads/release'
-        run: curl "${{ secrets.RENDER_DEPLOY_HOOK }}"
+        run: |
+          echo "Ra lệnh cho ECS cập nhật Service không làm gián đoạn người dùng (Rolling Update)..."
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}

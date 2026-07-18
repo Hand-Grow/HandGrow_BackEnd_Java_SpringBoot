@@ -14,6 +14,10 @@ import org.springframework.stereotype.Repository;
 public interface CollectionCommitmentRepository extends JpaRepository<CollectionCommitment, UUID> {
     List<CollectionCommitment> findByCampaignId(UUID campaignId, Pageable pageable);
 
+    boolean existsByCampaignIdAndFarmerId(UUID campaignId, UUID farmerId);
+
+    List<CollectionCommitment> findByCampaignIdAndFarmerId(UUID campaignId, UUID farmerId, Pageable pageable);
+
     @Query("SELECT COALESCE(SUM(c.committedQuantity), 0) FROM CollectionCommitment c WHERE c.campaign.id = :campaignId")
     BigDecimal sumQuantityByCampaign(@Param("campaignId") UUID campaignId);
 }

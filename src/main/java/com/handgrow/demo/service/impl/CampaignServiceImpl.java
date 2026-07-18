@@ -71,6 +71,10 @@ public class CampaignServiceImpl implements CampaignService {
         Farmer farmer =
                 farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
 
+        if (commitmentRepository.existsByCampaignIdAndFarmerId(campaignId, farmer.getId())) {
+            throw new RuntimeException("Report already exists");
+        }
+
         Plot plot =
                 plotRepository.findById(request.getPlotId()).orElseThrow(() -> new RuntimeException("Plot not found"));
 
@@ -85,7 +89,23 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Transactional
-    public List<CommitmentResponse> getCommitments(UUID campaignId, Pageable pageable) {
+    public List<CommitmentResponse> getCommitments(UUID campaignId, String username, Pageable pageable) {
+        java.util.Optional<Farmer> farmerOpt = farmerRepository.findByUsername(username);
+
+        if (farmerOpt.isPresent()) {
+            return commitmentRepository
+                    .findByCampaignIdAndFarmerId(campaignId, farmerOpt.get().getId(), pageable)
+                    .stream()
+                    .map(c -> CommitmentResponse.builder()
+                            .id(c.getId())
+                            .farmerName(c.getFarmer().getFullName())
+                            .plotName(c.getPlot().getName())
+                            .quantity(c.getCommittedQuantity())
+                            .createdAt(c.getCreatedAt())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
         return commitmentRepository.findByCampaignId(campaignId, pageable).stream()
                 .map(c -> CommitmentResponse.builder()
                         .id(c.getId())

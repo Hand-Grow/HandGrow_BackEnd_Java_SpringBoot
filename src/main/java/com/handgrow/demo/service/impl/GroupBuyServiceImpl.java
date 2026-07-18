@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class GroupBuyServiceImpl implements GroupBuyService {
     private final CooperativeRepository cooperativeRepository;
     private final FarmerRepository farmerRepository;
     private final GroupBuyOrderRepository orderRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     @Transactional
@@ -68,10 +70,32 @@ public class GroupBuyServiceImpl implements GroupBuyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GroupBuyCampaignResponse> getAllGatheringCampaigns(Pageable pageable) {
-        return campaignRepository.findByStatus(GroupBuyCampaignStatus.GATHERING, pageable).stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public List<GroupBuyCampaignResponse> getAllGatheringCampaigns(UUID accountId, Pageable pageable) {
+        Account account =
+                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+
+        String roleName = account.getRole().getName();
+
+        if ("FARMER".equals(roleName)) {
+            return farmerRepository
+                    .findByAccountId(accountId)
+                    .map(Farmer::getCooperative)
+                    .map(coop -> campaignRepository.findByCooperativeIdAndStatus(
+                            coop.getId(), GroupBuyCampaignStatus.GATHERING, pageable))
+                    .map(page -> page.stream().map(this::mapToResponse).collect(Collectors.toList()))
+                    .orElse(List.of());
+        } else if ("COOP".equals(roleName)) {
+            return cooperativeRepository
+                    .findByAccountId(accountId)
+                    .map(coop -> campaignRepository.findByCooperativeIdAndStatus(
+                            coop.getId(), GroupBuyCampaignStatus.GATHERING, pageable))
+                    .map(page -> page.stream().map(this::mapToResponse).collect(Collectors.toList()))
+                    .orElse(List.of());
+        } else {
+            return campaignRepository.findByStatus(GroupBuyCampaignStatus.GATHERING, pageable).stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -171,6 +195,19 @@ public class GroupBuyServiceImpl implements GroupBuyService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<GroupBuyParticipationResponse> getParticipationByCampaignAndFarmer(
+            UUID campaignId, UUID farmerAccountId) {
+        Farmer farmer = farmerRepository
+                .findByAccountId(farmerAccountId)
+                .orElseThrow(() -> new RuntimeException("Farmer not found"));
+
+        return participationRepository
+                .findByCampaignIdAndFarmerId(campaignId, farmer.getId())
+                .map(this::mapParticipationToResponse);
+    }
+
     private void updateCampaignStatus(GroupBuyCampaign campaign) {
         BigDecimal totalQty = participationRepository.sumCommittedQtyByCampaignId(campaign.getId());
         if (totalQty == null) totalQty = BigDecimal.ZERO;
@@ -253,6 +290,17 @@ public class GroupBuyServiceImpl implements GroupBuyService {
                         .size())
                 .progressPercent(progressPercent)
                 .nextTierLabel(nextTierLabel)
+                .build();
+    }
+
+    private GroupBuyParticipationResponse mapParticipationToResponse(GroupBuyParticipation p) {
+        return GroupBuyParticipationResponse.builder()
+                .id(p.getId())
+                .farmerId(p.getFarmer().getId())
+                .farmerName(p.getFarmer().getFullName())
+                .committedQty(p.getCommittedQty())
+                .lockedUnitPrice(p.getLockedUnitPrice())
+                .totalAmount(p.getTotalAmount())
                 .build();
     }
 }
