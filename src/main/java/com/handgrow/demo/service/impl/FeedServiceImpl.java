@@ -25,13 +25,13 @@ public class FeedServiceImpl implements FeedService {
     private final CollectionCampaignRepository campaignRepository;
     private final FeedLikeRepository likeRepository;
     private final FeedCommentRepository commentRepository;
-    private final FarmerRepository farmerRepository;
+    private final AccountRepository accountRepository;
     private final BulkSaleRepository bulkSaleRepository;
 
     @Transactional
     public List<FeedItemResponse> getFeed(UUID coopId, FeedTargetType type, String username, Pageable pageable) {
-        UUID farmerId =
-                farmerRepository.findByUsername(username).map(Farmer::getId).orElse(null);
+        UUID accountId =
+                accountRepository.findByUsername(username).map(Account::getId).orElse(null);
 
         List<FeedItemResponse> feed = new ArrayList<>();
 
@@ -48,10 +48,10 @@ public class FeedServiceImpl implements FeedService {
                         .likeCount(likeRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
                         .commentCount(
                                 commentRepository.countByTargetIdAndTargetType(a.getId(), FeedTargetType.ANNOUNCEMENT))
-                        .isLiked(farmerId != null
+                        .isLiked(accountId != null
                                 && likeRepository
-                                        .findByFarmerIdAndTargetIdAndTargetType(
-                                                farmerId, a.getId(), FeedTargetType.ANNOUNCEMENT)
+                                        .findByAccountIdAndTargetIdAndTargetType(
+                                                accountId, a.getId(), FeedTargetType.ANNOUNCEMENT)
                                         .isPresent())
                         .createdAt(a.getCreatedAt())
                         .build());
@@ -73,10 +73,10 @@ public class FeedServiceImpl implements FeedService {
                         .likeCount(likeRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
                         .commentCount(
                                 commentRepository.countByTargetIdAndTargetType(c.getId(), FeedTargetType.CAMPAIGN))
-                        .isLiked(farmerId != null
+                        .isLiked(accountId != null
                                 && likeRepository
-                                        .findByFarmerIdAndTargetIdAndTargetType(
-                                                farmerId, c.getId(), FeedTargetType.CAMPAIGN)
+                                        .findByAccountIdAndTargetIdAndTargetType(
+                                                accountId, c.getId(), FeedTargetType.CAMPAIGN)
                                         .isPresent())
                         .isPublished(bulkSaleRepository.existsByCampaignId(c.getId()))
                         .createdAt(c.getCreatedAt())
@@ -92,16 +92,16 @@ public class FeedServiceImpl implements FeedService {
 
     @Transactional
     public void toggleLike(String username, UUID targetId, FeedTargetType type) {
-        Farmer farmer =
-                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
-        UUID farmerId = farmer.getId();
+        Account account =
+                accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Account not found"));
+        UUID accountId = account.getId();
 
-        var existing = likeRepository.findByFarmerIdAndTargetIdAndTargetType(farmerId, targetId, type);
+        var existing = likeRepository.findByAccountIdAndTargetIdAndTargetType(accountId, targetId, type);
         if (existing.isPresent()) {
             likeRepository.delete(existing.get());
         } else {
             likeRepository.save(FeedLike.builder()
-                    .farmer(farmer)
+                    .account(account)
                     .targetId(targetId)
                     .targetType(type)
                     .build());
@@ -113,7 +113,7 @@ public class FeedServiceImpl implements FeedService {
         return commentRepository.findByTargetIdAndTargetTypeOrderByCreatedAtDesc(targetId, type, pageable).stream()
                 .map(c -> CommentResponse.builder()
                         .id(c.getId())
-                        .farmerName(c.getFarmer().getFullName())
+                        .farmerName(c.getAccount().getUsername()) // Assuming we want the username here
                         .content(c.getContent())
                         .createdAt(c.getCreatedAt())
                         .build())
@@ -123,11 +123,11 @@ public class FeedServiceImpl implements FeedService {
     @Transactional
     public CommentResponse addComment(
             String username, UUID targetId, FeedTargetType type, CreateCommentRequest request) {
-        Farmer farmer =
-                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
+        Account account =
+                accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Account not found"));
 
         FeedComment comment = commentRepository.save(FeedComment.builder()
-                .farmer(farmer)
+                .account(account)
                 .targetId(targetId)
                 .targetType(type)
                 .content(request.getContent())
@@ -135,7 +135,7 @@ public class FeedServiceImpl implements FeedService {
 
         return CommentResponse.builder()
                 .id(comment.getId())
-                .farmerName(farmer.getFullName())
+                .farmerName(account.getUsername())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
