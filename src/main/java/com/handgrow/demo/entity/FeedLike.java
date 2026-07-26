@@ -15,8 +15,8 @@ import lombok.*;
 public class FeedLike extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "farmer_id", nullable = false)
-    private Farmer farmer;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
     @Column(name = "target_id", nullable = false)
     private UUID targetId;

@@ -38,3 +38,11 @@ out/
 
 ### Environment Variables ###
 .env
+
+### Terraform & SSH Keys ###
+*.pem
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.tfstate.lock.info

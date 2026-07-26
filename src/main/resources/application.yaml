@@ -101,12 +101,12 @@ gemini:
   api:
     key: ${GEMINI_API_KEY:}
 # ===============================
-# 6. AWS CONFIGURATION
+# 7. AWS S3 CONFIGURATION
 # ===============================
 aws:
-  credentials:
-    access-key: ${AWS_ACCESS_KEY}
-    secret-key: ${AWS_SECRET_KEY}
   s3:
-    region: ${AWS_REGION}
-    bucket-name: ${AWS_BUCKET_NAME}
+    region: ${AWS_REGION:ap-southeast-1}
+    bucket-name: ${AWS_BUCKET_NAME:handgrow-bucket}
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID:default}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:default}

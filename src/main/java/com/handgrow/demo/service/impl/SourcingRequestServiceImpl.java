@@ -6,11 +6,15 @@ import com.handgrow.demo.dto.response.SourcingRequestResponse;
 import com.handgrow.demo.entity.Account;
 import com.handgrow.demo.entity.SourcingRequest;
 import com.handgrow.demo.entity.SourcingRequest.SourcingRequestStatus;
+import com.handgrow.demo.exception.AppException;
+import com.handgrow.demo.exception.ErrorCode;
+import com.handgrow.demo.mapper.SourcingRequestMapper;
 import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.repository.SourcingRequestRepository;
 import com.handgrow.demo.service.SourcingRequestService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,27 +24,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class SourcingRequestServiceImpl implements SourcingRequestService {
 
     private final SourcingRequestRepository sourcingRequestRepository;
     private final AccountRepository accountRepository;
+    private final SourcingRequestMapper sourcingRequestMapper;
 
     @Override
     public SimpleResponse createSourcingRequest(CreateSourcingRequest request, UUID enterpriseId) {
         Account enterprise = accountRepository
                 .findById(enterpriseId)
-                .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-        SourcingRequest sourcingRequest = SourcingRequest.builder()
-                .productName(request.getProductName())
-                .quantity(request.getQuantity())
-                .unit(request.getUnit())
-                .expectedPrice(request.getExpectedPrice())
-                .deadline(request.getDeadline())
-                .requirements(request.getRequirements())
-                .enterprise(enterprise)
-                .status(SourcingRequestStatus.OPEN)
-                .build();
+        SourcingRequest sourcingRequest = sourcingRequestMapper.toEntity(request);
+        sourcingRequest.setEnterprise(enterprise);
+        sourcingRequest.setStatus(SourcingRequestStatus.OPEN);
 
         SourcingRequest savedRequest = sourcingRequestRepository.save(sourcingRequest);
 
@@ -55,7 +54,7 @@ public class SourcingRequestServiceImpl implements SourcingRequestService {
     @Transactional(readOnly = true)
     @Override
     public Page<SourcingRequestResponse> getAllSourcingRequests(Pageable pageable) {
-        return sourcingRequestRepository.findAll(pageable).map(this::convertToResponse);
+        return sourcingRequestRepository.findAll(pageable).map(sourcingRequestMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +62,7 @@ public class SourcingRequestServiceImpl implements SourcingRequestService {
     public Page<SourcingRequestResponse> getOpenSourcingRequests(Pageable pageable) {
         return sourcingRequestRepository
                 .findByStatus(SourcingRequestStatus.OPEN, pageable)
-                .map(this::convertToResponse);
+                .map(sourcingRequestMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
@@ -80,7 +79,7 @@ public class SourcingRequestServiceImpl implements SourcingRequestService {
 
         return sourcingRequestRepository
                 .searchSourcingRequests(productName, requestStatus, pageable)
-                .map(this::convertToResponse);
+                .map(sourcingRequestMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +87,7 @@ public class SourcingRequestServiceImpl implements SourcingRequestService {
     public Page<SourcingRequestResponse> getMySourcingRequests(UUID enterpriseId, Pageable pageable) {
         return sourcingRequestRepository
                 .findByEnterpriseId(enterpriseId, pageable)
-                .map(this::convertToResponse);
+                .map(sourcingRequestMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
@@ -96,15 +95,15 @@ public class SourcingRequestServiceImpl implements SourcingRequestService {
     public SourcingRequestResponse getSourcingRequestById(UUID id) {
         SourcingRequest request = sourcingRequestRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Sourcing request not found"));
-        return convertToResponse(request);
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+        return sourcingRequestMapper.toResponse(request);
     }
 
     @Override
     public SimpleResponse updateSourcingRequestStatus(UUID id, SourcingRequestStatus status) {
         SourcingRequest request = sourcingRequestRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Sourcing request not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         request.setStatus(status);
         sourcingRequestRepository.save(request);
@@ -121,10 +120,14 @@ public class SourcingRequestServiceImpl implements SourcingRequestService {
     public SimpleResponse cancelSourcingRequest(UUID id, UUID enterpriseId) {
         SourcingRequest request = sourcingRequestRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Sourcing request not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!request.getEnterprise().getId().equals(enterpriseId)) {
-            throw new RuntimeException("You can only cancel your own sourcing request");
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+
+        if (request.getStatus() != SourcingRequestStatus.OPEN) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
         request.setStatus(SourcingRequestStatus.CANCELLED);
@@ -135,23 +138,6 @@ public class SourcingRequestServiceImpl implements SourcingRequestService {
                 .status(HttpStatus.OK.value())
                 .success(true)
                 .data(request.getId())
-                .build();
-    }
-
-    private SourcingRequestResponse convertToResponse(SourcingRequest request) {
-        return SourcingRequestResponse.builder()
-                .id(request.getId())
-                .productName(request.getProductName())
-                .quantity(request.getQuantity())
-                .unit(request.getUnit())
-                .expectedPrice(request.getExpectedPrice())
-                .deadline(request.getDeadline())
-                .requirements(request.getRequirements())
-                .status(request.getStatus().name())
-                .enterpriseId(request.getEnterprise().getId())
-                .enterpriseName(request.getEnterprise().getUsername())
-                .createdAt(request.getCreatedAt())
-                .updatedAt(request.getUpdatedAt())
                 .build();
     }
 }

@@ -38,6 +38,9 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
+	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("io.github.cdimascio:java-dotenv:5.2.2")
     // JWT
@@ -55,7 +58,9 @@ dependencies {
 	// Test dependency
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
-	// AWS S3 dependency
+	// Cloudinary dependency
+	implementation("com.cloudinary:cloudinary-http44:1.36.0")
+	// AWS SDK S3
 	implementation("software.amazon.awssdk:s3:2.25.11")
 	// WebFlux — needed for WebClient to call Gemini HTTP API
 	implementation("org.springframework.boot:spring-boot-starter-webflux")

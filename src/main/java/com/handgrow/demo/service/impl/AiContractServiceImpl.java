@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.handgrow.demo.dto.response.DraftContractResponse;
 import com.handgrow.demo.entity.BulkSale;
+import com.handgrow.demo.service.AiContractService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AiContractServiceImpl {
+public class AiContractServiceImpl implements AiContractService {
 
     private static final String GEMINI_API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";

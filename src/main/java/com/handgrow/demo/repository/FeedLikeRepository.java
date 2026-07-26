@@ -9,9 +9,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FeedLikeRepository extends JpaRepository<FeedLike, UUID> {
-    Optional<FeedLike> findByFarmerIdAndTargetIdAndTargetType(UUID farmerId, UUID targetId, FeedTargetType type);
+    Optional<FeedLike> findByAccountIdAndTargetIdAndTargetType(UUID accountId, UUID targetId, FeedTargetType type);
 
     long countByTargetIdAndTargetType(UUID targetId, FeedTargetType type);
 
-    void deleteByFarmerIdAndTargetIdAndTargetType(UUID farmerId, UUID targetId, FeedTargetType type);
+    void deleteByAccountIdAndTargetIdAndTargetType(UUID accountId, UUID targetId, FeedTargetType type);
 }

@@ -4,8 +4,8 @@ import com.handgrow.demo.dto.request.CreateSourcingRequest;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.dto.response.SourcingRequestResponse;
 import com.handgrow.demo.entity.SourcingRequest.SourcingRequestStatus;
-import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.service.SourcingRequestService;
+import com.handgrow.demo.util.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,13 +31,9 @@ import org.springframework.web.bind.annotation.*;
 public class SourcingRequestController {
 
     private final SourcingRequestService sourcingRequestService;
-    private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Account not found"))
-                .getId();
+        return SecurityUtils.extractAccountId((org.springframework.security.core.Authentication) principal);
     }
 
     @PostMapping

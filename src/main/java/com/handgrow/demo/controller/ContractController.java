@@ -5,6 +5,7 @@ import com.handgrow.demo.dto.response.DraftContractResponse;
 import com.handgrow.demo.dto.response.ElectronicContractResponse;
 import com.handgrow.demo.service.ContractService;
 import com.handgrow.demo.service.PdfExportService;
+import com.handgrow.demo.util.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -155,9 +156,6 @@ public class ContractController {
 
     /** Trích xuất AccountId (UUID) từ principal đã được Spring Security decode */
     private UUID extractAccountId(Authentication authentication) {
-        if (authentication.getPrincipal() instanceof com.handgrow.demo.entity.Account account) {
-            return account.getId();
-        }
-        throw new RuntimeException("User not authenticated correctly");
+        return SecurityUtils.extractAccountId(authentication);
     }
 }

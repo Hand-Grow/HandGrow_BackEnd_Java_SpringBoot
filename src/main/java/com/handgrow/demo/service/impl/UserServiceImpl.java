@@ -5,6 +5,9 @@ import com.handgrow.demo.dto.request.UpdateProfileRequest;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.dto.response.UserResponse;
 import com.handgrow.demo.entity.*;
+import com.handgrow.demo.exception.AppException;
+import com.handgrow.demo.exception.ErrorCode;
+import com.handgrow.demo.mapper.UserMapper;
 import com.handgrow.demo.repository.*;
 import com.handgrow.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +22,14 @@ public class UserServiceImpl implements UserService {
     private final FarmerRepository farmerRepository;
     private final CooperativeRepository cooperativeRepository;
     private final EnterpriseRepository enterpriseRepository;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(readOnly = true)
     public UserResponse getUserProfile(String username) {
-        Account account =
-                accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        Account account = accountRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         String roleName = account.getRole().getName();
 
@@ -36,88 +41,46 @@ public class UserServiceImpl implements UserService {
             case "ENTERPRISE":
                 return buildEnterpriseResponse(account);
             default:
-                throw new RuntimeException("Unknown user role");
+                throw new AppException(ErrorCode.INVALID_REQUEST);
         }
     }
 
     private UserResponse buildFarmerResponse(Account account) {
         Farmer farmer =
-                farmerRepository.findByAccount(account).orElseThrow(() -> new RuntimeException("Farmer not found"));
+                farmerRepository.findByAccount(account).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        String cooperativeId = null;
-        String cooperativeName = null;
-        if (farmer.getCooperative() != null) {
-            cooperativeId = farmer.getCooperative().getId().toString();
-            cooperativeName = farmer.getCooperative().getName();
-        }
-
-        return UserResponse.builder()
-                .id(farmer.getId().toString())
-                .fullName(farmer.getFullName())
-                .username(account.getUsername())
-                .phoneNumber(farmer.getPhoneNumber())
-                .role("FARMER")
-                .avatarUrl(farmer.getAvatarUrl())
-                .address(farmer.getAddress())
-                .commune(farmer.getCommune())
-                .province(farmer.getProvince())
-                .produce(farmer.getProduce() != null ? farmer.getProduce().name() : null)
-                .cooperativeId(cooperativeId)
-                .cooperativeName(cooperativeName)
-                .build();
+        return userMapper.toUserResponse(account, farmer);
     }
 
     private UserResponse buildCoopResponse(Account account) {
         Cooperative coop = cooperativeRepository
                 .findByAccount(account)
-                .orElseThrow(() -> new RuntimeException("Cooperative not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        return UserResponse.builder()
-                .id(coop.getId().toString())
-                .fullName(coop.getName())
-                .username(account.getUsername())
-                .phoneNumber(coop.getPhoneNumber())
-                .role("COOP")
-                .avatarUrl(coop.getAvatarUrl())
-                .address(coop.getAddress())
-                .commune(coop.getCommune())
-                .province(coop.getProvince())
-                .representativeName(coop.getRepresentativeName())
-                .build();
+        return userMapper.toUserResponse(account, coop);
     }
 
     private UserResponse buildEnterpriseResponse(Account account) {
         Enterprise enterprise = enterpriseRepository
                 .findByAccount(account)
-                .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        return UserResponse.builder()
-                .id(enterprise.getId().toString())
-                .fullName(enterprise.getCompanyName())
-                .username(account.getUsername())
-                .phoneNumber(enterprise.getPhoneNumber())
-                .role("ENTERPRISE")
-                .avatarUrl(enterprise.getAvatarUrl())
-                .address(enterprise.getAddress())
-                .commune(enterprise.getCommune())
-                .province(enterprise.getProvince())
-                .representativeName(enterprise.getRepresentativeName())
-                .build();
+        return userMapper.toUserResponse(account, enterprise);
     }
 
     @Override
     @Transactional
     public SimpleResponse updateFarmerLocation(String username, FarmerLocationUpdateDto locationDto) {
-        Account account =
-                accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        Account account = accountRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if (!"FARMER".equals(account.getRole().getName())) {
-            throw new RuntimeException("Only farmers can update location");
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
 
-        Farmer farmer = farmerRepository
-                .findByAccount(account)
-                .orElseThrow(() -> new RuntimeException("Farmer profile not found"));
+        Farmer farmer =
+                farmerRepository.findByAccount(account).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         farmer.setCommune(locationDto.getCommune());
         farmer.setProvince(locationDto.getProvince());
@@ -133,8 +96,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public SimpleResponse updateUserProfile(String username, UpdateProfileRequest request) {
-        Account account =
-                accountRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        Account account = accountRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         String role = account.getRole().getName();
 
@@ -142,7 +106,7 @@ public class UserServiceImpl implements UserService {
             case "FARMER":
                 Farmer farmer = farmerRepository
                         .findByAccount(account)
-                        .orElseThrow(() -> new RuntimeException("Farmer profile not found"));
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
                 if (request.getFullName() != null) farmer.setFullName(request.getFullName());
                 if (request.getPhoneNumber() != null) farmer.setPhoneNumber(request.getPhoneNumber());
@@ -160,7 +124,7 @@ public class UserServiceImpl implements UserService {
             case "COOP":
                 Cooperative coop = cooperativeRepository
                         .findByAccount(account)
-                        .orElseThrow(() -> new RuntimeException("Cooperative not found"));
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
                 if (request.getCompanyName() != null) coop.setName(request.getCompanyName());
                 if (request.getPhoneNumber() != null) coop.setPhoneNumber(request.getPhoneNumber());
@@ -180,7 +144,7 @@ public class UserServiceImpl implements UserService {
             case "ENTERPRISE":
                 Enterprise enterprise = enterpriseRepository
                         .findByAccount(account)
-                        .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
                 if (request.getCompanyName() != null) enterprise.setCompanyName(request.getCompanyName());
                 if (request.getPhoneNumber() != null) enterprise.setPhoneNumber(request.getPhoneNumber());
@@ -199,7 +163,7 @@ public class UserServiceImpl implements UserService {
                         .build();
 
             default:
-                throw new RuntimeException("Unsupported role");
+                throw new AppException(ErrorCode.INVALID_REQUEST);
         }
     }
 }

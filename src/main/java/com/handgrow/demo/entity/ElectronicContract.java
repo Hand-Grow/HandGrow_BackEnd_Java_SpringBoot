@@ -48,6 +48,7 @@ public class ElectronicContract extends BaseEntity {
     @Column(name = "enterprise_signatory_name", length = 255)
     private String enterpriseSignatoryName;
 
+    @Builder.Default
     @Column(name = "enterprise_signed")
     @ColumnDefault("false")
     private Boolean enterpriseSigned = false;

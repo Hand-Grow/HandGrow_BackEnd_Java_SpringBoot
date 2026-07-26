@@ -4,6 +4,9 @@ import com.handgrow.demo.dto.request.CreateProductRequest;
 import com.handgrow.demo.dto.response.ProductResponse;
 import com.handgrow.demo.entity.Enterprise;
 import com.handgrow.demo.entity.Product;
+import com.handgrow.demo.exception.AppException;
+import com.handgrow.demo.exception.ErrorCode;
+import com.handgrow.demo.mapper.ProductMapper;
 import com.handgrow.demo.repository.EnterpriseRepository;
 import com.handgrow.demo.repository.ProductRepository;
 import com.handgrow.demo.service.ProductService;
@@ -21,30 +24,20 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final EnterpriseRepository enterpriseRepository;
+    private final ProductMapper productMapper;
 
     @Override
     @Transactional
     public ProductResponse createProduct(UUID enterpriseAccountId, CreateProductRequest request) {
         Enterprise enterprise = enterpriseRepository
                 .findByAccountId(enterpriseAccountId)
-                .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        Product product = Product.builder()
-                .enterprise(enterprise)
-                .name(request.getName())
-                .category(request.getCategory())
-                .unit(request.getUnit())
-                .basePrice(request.getBasePrice())
-                .description(request.getDescription())
-                .imageUrl(request.getImageUrl())
-                .attributes(request.getAttributes())
-                .priceTiers(request.getPriceTiers().stream()
-                        .map(t -> new Product.PriceTier(t.getMinQty(), t.getPrice()))
-                        .collect(Collectors.toList()))
-                .build();
+        Product product = productMapper.toEntity(request);
+        product.setEnterprise(enterprise);
 
         Product saved = productRepository.save(product);
-        return mapToResponse(saved);
+        return productMapper.toResponse(saved);
     }
 
     @Override
@@ -52,10 +45,10 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getProductsByEnterprise(UUID enterpriseAccountId, Pageable pageable) {
         Enterprise enterprise = enterpriseRepository
                 .findByAccountId(enterpriseAccountId)
-                .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return productRepository.findByEnterpriseId(enterprise.getId(), pageable).stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -63,32 +56,15 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts(Pageable pageable) {
         return productRepository.findAll(pageable).stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProductResponse getProductById(UUID id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
-        return mapToResponse(product);
-    }
-
-    private ProductResponse mapToResponse(Product product) {
-        return ProductResponse.builder()
-                .id(product.getId())
-                .enterpriseId(product.getEnterprise().getId())
-                .enterpriseName(product.getEnterprise().getCompanyName())
-                .name(product.getName())
-                .category(product.getCategory())
-                .unit(product.getUnit())
-                .basePrice(product.getBasePrice())
-                .description(product.getDescription())
-                .imageUrl(product.getImageUrl())
-                .attributes(product.getAttributes())
-                .priceTiers(product.getPriceTiers().stream()
-                        .map(t -> new ProductResponse.PriceTierResponse(t.getMinQty(), t.getPrice()))
-                        .collect(Collectors.toList()))
-                .build();
+        Product product =
+                productRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        return productMapper.toResponse(product);
     }
 }
