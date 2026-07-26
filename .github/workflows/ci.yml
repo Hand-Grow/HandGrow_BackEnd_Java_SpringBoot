@@ -80,7 +80,16 @@ jobs:
               -p 8080:8080 \
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=prod \
+              -e DB_URL=${{ secrets.DB_URL }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e MONGO_URI=${{ secrets.MONGO_URI }} \
+              -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+              -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+              -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+              -e AWS_REGION=${{ env.AWS_REGION }} \
+              -e AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }} \
               ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
             
             # Cleanup old images
-            sudo docker image prune -f
+            sudo docker image prune -af
