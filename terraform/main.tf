@@ -23,7 +23,17 @@ resource "local_file" "private_key_pem" {
   file_permission = "0400"
 }
 
-# 1. Security Group
+# 1. Tự động tạo kho chứa Docker Image trên ECR
+resource "aws_ecr_repository" "handgrow_backend_repo" {
+  name                 = "handgrow-backend"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+# 2. Security Group
 resource "aws_security_group" "handgrow_sg" {
   name        = "handgrow-backend-sg"
   description = "Allow HTTP and SSH traffic"
