@@ -83,4 +83,4 @@ jobs:
               ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
             
             # Cleanup old images
-            sudo docker image prune -f
+            sudo docker image prune -af
