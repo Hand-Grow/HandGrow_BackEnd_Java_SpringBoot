@@ -1,4 +1,4 @@
-name: Deploy HandGrow Backend to AWS ECS Fargate
+name: Build and Deploy HandGrow Backend
 
 on:
   push:
@@ -9,18 +9,16 @@ on:
 env:
   AWS_REGION: ap-southeast-1            
   ECR_REPOSITORY: handgrow-backend      
-  ECS_CLUSTER: earnest-koala-7uh4h7        
-  ECS_SERVICE: handgrow-backend-task-service-jwrr11kn     
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-southeast-1.amazonaws.com
 
 jobs:
-  build_push_and_deploy:
+  ci-build-and-push:
+    name: Continuous Integration
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # 1. Xác thực danh tính với AWS bằng tài khoản IAM dành riêng cho CI/CD
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -28,55 +26,61 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 2. Mở cửa kho ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # 3. Đóng gói code Spring Boot thành Docker Image và đẩy lên ECR
       - name: Build, tag, and push image to Amazon ECR
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }} # Dùng mã commit làm tag để dễ dàng rollback khi cần
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          echo "Bắt đầu build Docker Image..."
-          # Đánh 2 tag: một tag 'latest' và một tag theo mã commit
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          echo "Building Docker Image..."
+          docker build -t $REGISTRY/$ECR_REPOSITORY:latest -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           
-          echo "Bắt đầu đẩy Image lên AWS ECR..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags
+          echo "Pushing Image to AWS ECR..."
+          docker push $REGISTRY/$ECR_REPOSITORY --all-tags
 
-      # 4. Ra lệnh cho AWS Fargate tự động kéo Image mới về và cập nhật hệ thống
-      # - name: Force new deployment on ECS Fargate
-      #   if: github.ref == 'refs/heads/release'
-      #   run: |
-      #     aws ecs update-service ...
-      
-      # 4. Deploy to EC2 via SSH
-      - name: Deploy to EC2
-        if: github.ref == 'refs/heads/release'
+  cd-deploy-to-ec2:
+    name: Continuous Deployment
+    needs: ci-build-and-push
+    if: github.ref == 'refs/heads/release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Đăng nhập ECR từ trong EC2
+            # Login to ECR on the EC2 instance
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
             
-            # Tải image mới nhất
+            # Pull the latest image
             sudo docker pull ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
             
-            # Dừng và xóa container cũ
+            # Stop and remove the old container
             sudo docker stop handgrow-backend || true
             sudo docker rm handgrow-backend || true
             
-            # Chạy container mới
+            # Run the new container
             sudo docker run -d --name handgrow-backend \
               -p 8080:8080 \
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=prod \
               ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
             
-            # Dọn dẹp image cũ để tiết kiệm dung lượng
+            # Cleanup old images
             sudo docker image prune -f
