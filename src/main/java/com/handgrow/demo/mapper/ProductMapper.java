@@ -6,7 +6,7 @@ import com.handgrow.demo.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", builder = @org.mapstruct.Builder(disableBuilder = true))
 public interface ProductMapper {
 
     @Mapping(target = "enterpriseId", source = "enterprise.id")

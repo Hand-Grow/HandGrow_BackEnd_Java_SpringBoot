@@ -101,9 +101,12 @@ gemini:
   api:
     key: ${GEMINI_API_KEY:}
 # ===============================
-# 6. CLOUDINARY CONFIGURATION
+# 7. AWS S3 CONFIGURATION
 # ===============================
-cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_API_SECRET}
+aws:
+  s3:
+    region: ${AWS_REGION:ap-southeast-1}
+    bucket-name: ${AWS_BUCKET_NAME:handgrow-bucket}
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID:default}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:default}

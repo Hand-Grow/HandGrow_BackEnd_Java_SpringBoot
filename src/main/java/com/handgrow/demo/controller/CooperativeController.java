@@ -1,6 +1,7 @@
 package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.CooperativeSearchDto;
+import com.handgrow.demo.dto.response.ApiResponse;
 import com.handgrow.demo.dto.response.CooperativeResponse;
 import com.handgrow.demo.entity.enums.Produce;
 import com.handgrow.demo.service.CooperativeService;
@@ -17,13 +18,13 @@ public class CooperativeController {
     private final CooperativeService cooperativeService;
 
     @GetMapping
-    public ResponseEntity<List<CooperativeResponse>> getAllCooperatives() {
+    public ResponseEntity<ApiResponse<List<CooperativeResponse>>> getAllCooperatives() {
         List<CooperativeResponse> cooperatives = cooperativeService.getAllCooperatives();
-        return ResponseEntity.ok(cooperatives);
+        return ResponseEntity.ok(ApiResponse.success(cooperatives));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<CooperativeResponse>> searchCooperatives(
+    public ResponseEntity<ApiResponse<List<CooperativeResponse>>> searchCooperatives(
             @RequestParam(required = false) String commune,
             @RequestParam(required = false) String province,
             @RequestParam(required = false) Produce produce) {
@@ -34,6 +35,6 @@ public class CooperativeController {
         searchDto.setProduce(produce);
 
         List<CooperativeResponse> cooperatives = cooperativeService.searchCooperatives(searchDto);
-        return ResponseEntity.ok(cooperatives);
+        return ResponseEntity.ok(ApiResponse.success(cooperatives));
     }
 }

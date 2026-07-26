@@ -13,6 +13,8 @@ import com.handgrow.demo.entity.Farmer;
 import com.handgrow.demo.entity.FarmingDiary;
 import com.handgrow.demo.entity.Plot;
 import com.handgrow.demo.entity.enums.ActivityType;
+import com.handgrow.demo.exception.AppException;
+import com.handgrow.demo.exception.ErrorCode;
 import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.FarmingDiaryRepository;
 import com.handgrow.demo.repository.PlotRepository;
@@ -156,13 +158,14 @@ public class VoiceDiaryServiceImpl implements VoiceDiaryService {
     @Transactional
     public DiaryResponse createDiary(String username, CreateDiaryRequest request) {
         Farmer farmer =
-                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
+                farmerRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        Plot plot =
-                plotRepository.findById(request.getPlotId()).orElseThrow(() -> new RuntimeException("Plot not found"));
+        Plot plot = plotRepository
+                .findById(request.getPlotId())
+                .orElseThrow(() -> new AppException(ErrorCode.PLOT_NOT_FOUND));
 
         if (!plot.getFarmer().getId().equals(farmer.getId())) {
-            throw new RuntimeException("Plot does not belong to current farmer");
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
 
         FarmingDiary diary = FarmingDiary.builder()
@@ -206,7 +209,7 @@ public class VoiceDiaryServiceImpl implements VoiceDiaryService {
     @Transactional
     public DiaryResponse getDiaryById(UUID diaryId) {
         FarmingDiary diary =
-                diaryRepository.findById(diaryId).orElseThrow(() -> new RuntimeException("Diary not found"));
+                diaryRepository.findById(diaryId).orElseThrow(() -> new AppException(ErrorCode.DIARY_NOT_FOUND));
 
         return DiaryResponse.builder()
                 .id(diary.getId())
@@ -222,7 +225,7 @@ public class VoiceDiaryServiceImpl implements VoiceDiaryService {
     @Transactional
     public DiaryResponse updateDiary(UUID diaryId, CreateDiaryRequest request) {
         FarmingDiary diary =
-                diaryRepository.findById(diaryId).orElseThrow(() -> new RuntimeException("Diary not found"));
+                diaryRepository.findById(diaryId).orElseThrow(() -> new AppException(ErrorCode.DIARY_NOT_FOUND));
 
         diary.setActivityDate(request.getActivityDate());
         diary.setActivityType(request.getActivityType());

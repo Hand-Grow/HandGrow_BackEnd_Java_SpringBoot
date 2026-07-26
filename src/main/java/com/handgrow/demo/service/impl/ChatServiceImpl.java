@@ -7,6 +7,8 @@ import com.handgrow.demo.dto.request.SendChatMessageRequest;
 import com.handgrow.demo.dto.response.ChatMessageResponse;
 import com.handgrow.demo.dto.response.ChatRoomResponse;
 import com.handgrow.demo.entity.*;
+import com.handgrow.demo.exception.AppException;
+import com.handgrow.demo.exception.ErrorCode;
 import com.handgrow.demo.repository.*;
 import com.handgrow.demo.service.ChatService;
 import java.time.LocalDateTime;
@@ -38,15 +40,15 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ChatRoomResponse getOrCreateRoom(UUID accountId, CreateChatRoomRequest request) {
         Account account =
-                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         Enterprise enterprise = enterpriseRepository
                 .findByAccount(account)
-                .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         BulkSale bulkSale = bulkSaleRepository
                 .findById(request.getBulkSaleId())
-                .orElseThrow(() -> new RuntimeException("BulkSale not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         MongoChatRoom room = chatRoomRepository
                 .findByBulkSaleIdAndEnterpriseId(
@@ -73,14 +75,14 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<ChatRoomResponse> getMyRooms(UUID accountId) {
         Account account =
-                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         String role = account.getRole().getName();
 
         List<MongoChatRoom> rooms;
         if (role.equals("ENTERPRISE")) {
             Enterprise enterprise = enterpriseRepository
                     .findByAccount(account)
-                    .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+                    .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
             log.info("Fetching rooms for ENTERPRISE ID: {}", enterprise.getId());
             rooms = chatRoomRepository.findByEnterpriseIdOrderByUpdatedAtDesc(
                     enterprise.getId().toString());
@@ -108,13 +110,13 @@ public class ChatServiceImpl implements ChatService {
 
     private void validateUserAccessToRoom(MongoChatRoom room, UUID accountId) {
         Account account =
-                accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+                accountRepository.findById(accountId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
         String role = account.getRole().getName();
 
         if ("ENTERPRISE".equals(role)) {
             Enterprise enterprise = enterpriseRepository
                     .findByAccount(account)
-                    .orElseThrow(() -> new RuntimeException("Enterprise not found"));
+                    .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
             // Nếu Doanh nghiệp đăng nhập không khớp với Doanh nghiệp của phòng chat -> CÚT!
             if (room.getEnterpriseId() == null
                     || !room.getEnterpriseId().equals(enterprise.getId().toString())) {
@@ -131,7 +133,7 @@ public class ChatServiceImpl implements ChatService {
                 || "ROLE_COOPERATIVE".equals(role)) {
             Cooperative cooperative = cooperativeRepository
                     .findByAccount(account)
-                    .orElseThrow(() -> new RuntimeException("Cooperative not found"));
+                    .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
             // Nếu HTX đăng nhập không khớp với HTX của phòng chat -> CÚT!
             if (room.getCooperativeId() == null
                     || !room.getCooperativeId().equals(cooperative.getId().toString())) {
@@ -143,8 +145,9 @@ public class ChatServiceImpl implements ChatService {
                         + " != User Coop ID: " + cooperative.getId());
             }
         } else if ("FARMER".equals(role)) {
-            Farmer farmer =
-                    farmerRepository.findByAccount(account).orElseThrow(() -> new RuntimeException("Farmer not found"));
+            Farmer farmer = farmerRepository
+                    .findByAccount(account)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
             // Nông dân được xem phòng chat của HTX mình
             if (room.getCooperativeId() == null
                     || !room.getCooperativeId()
@@ -158,16 +161,15 @@ public class ChatServiceImpl implements ChatService {
             }
         } else {
             log.error("Access Denied: Role {} không hợp lệ!", role);
-            throw new RuntimeException("Access Denied: Role không hợp lệ!");
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
     }
 
     @Override
     public List<ChatMessageResponse> getMessages(String roomId, UUID accountId, Pageable pageable) {
         // 1. Tìm phòng chat trước
-        MongoChatRoom room = chatRoomRepository
-                .findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
+        MongoChatRoom room =
+                chatRoomRepository.findById(roomId).orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         // 2. CHẶN CỬA: Kiểm tra quyền truy cập!
         try {
@@ -202,7 +204,7 @@ public class ChatServiceImpl implements ChatService {
     public ChatMessageResponse sendMessage(String roomId, UUID accountId, SendChatMessageRequest request) {
         // 1. Tìm phòng chat
         MongoChatRoom room =
-                chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found"));
+                chatRoomRepository.findById(roomId).orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
         // 2. CHẶN CỬA: Ngăn chặn gửi tin nhắn mạo danh vào phòng người khác!
         validateUserAccessToRoom(room, accountId);

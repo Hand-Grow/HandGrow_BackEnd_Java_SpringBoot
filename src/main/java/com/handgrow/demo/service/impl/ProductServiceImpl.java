@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse createProduct(UUID enterpriseAccountId, CreateProductRequest request) {
         Enterprise enterprise = enterpriseRepository
                 .findByAccountId(enterpriseAccountId)
-                .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         Product product = productMapper.toEntity(request);
         product.setEnterprise(enterprise);
@@ -45,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getProductsByEnterprise(UUID enterpriseAccountId, Pageable pageable) {
         Enterprise enterprise = enterpriseRepository
                 .findByAccountId(enterpriseAccountId)
-                .orElseThrow(() -> new RuntimeException("Enterprise not found for account"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return productRepository.findByEnterpriseId(enterprise.getId(), pageable).stream()
                 .map(productMapper::toResponse)

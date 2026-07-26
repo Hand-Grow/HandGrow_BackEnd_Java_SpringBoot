@@ -1,6 +1,7 @@
 package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.CreateProductRequest;
+import com.handgrow.demo.dto.response.ApiResponse;
 import com.handgrow.demo.dto.response.ProductResponse;
 import com.handgrow.demo.service.ProductService;
 import com.handgrow.demo.util.SecurityUtils;
@@ -25,23 +26,24 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @Valid @RequestBody CreateProductRequest request, Principal principal) {
-        return ResponseEntity.ok(productService.createProduct(getAccountId(principal), request));
+        return ResponseEntity.ok(ApiResponse.success(productService.createProduct(getAccountId(principal), request)));
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts(Pageable pageable) {
-        return ResponseEntity.ok(productService.getAllProducts(pageable));
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts(Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(productService.getAllProducts(pageable)));
     }
 
     @GetMapping("/enterprise/me")
-    public ResponseEntity<List<ProductResponse>> getMyProducts(Principal principal, Pageable pageable) {
-        return ResponseEntity.ok(productService.getProductsByEnterprise(getAccountId(principal), pageable));
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getMyProducts(Principal principal, Pageable pageable) {
+        return ResponseEntity.ok(
+                ApiResponse.success(productService.getProductsByEnterprise(getAccountId(principal), pageable)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable UUID id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.success(productService.getProductById(id)));
     }
 }

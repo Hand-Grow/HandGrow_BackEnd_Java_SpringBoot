@@ -1,6 +1,7 @@
 package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.CreateDiaryRequest;
+import com.handgrow.demo.dto.response.ApiResponse;
 import com.handgrow.demo.dto.response.DiaryResponse;
 import com.handgrow.demo.dto.response.ProfitResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
@@ -29,7 +30,7 @@ public class VoiceDiaryController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload voice diary", description = "Upload MP3 audio file to convert to diary entry")
-    public ResponseEntity<VoiceDiaryResponse> uploadVoiceDiary(
+    public ResponseEntity<ApiResponse<VoiceDiaryResponse>> uploadVoiceDiary(
             @Parameter(
                             description = "Audio file (MP3, WAV, etc.)",
                             required = true,
@@ -38,57 +39,54 @@ public class VoiceDiaryController {
                     MultipartFile audioFile) {
 
         if (audioFile.isEmpty()) {
-            return ResponseEntity.badRequest()
-                    .body(VoiceDiaryResponse.builder()
-                            .status("error")
-                            .message("File must not be empty")
-                            .build());
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "File must not be empty"));
         }
 
         VoiceDiaryResponse response = voiceDiaryService.processVoiceDiary(audioFile);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping
     @Operation(summary = "Create diary entry")
-    public ResponseEntity<DiaryResponse> createDiary(Principal principal, @RequestBody CreateDiaryRequest request) {
-        return ResponseEntity.ok(voiceDiaryService.createDiary(principal.getName(), request));
+    public ResponseEntity<ApiResponse<DiaryResponse>> createDiary(
+            Principal principal, @RequestBody CreateDiaryRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(voiceDiaryService.createDiary(principal.getName(), request)));
     }
 
     @GetMapping("/plot/{plotId}")
     @Operation(summary = "Get diaries by plot")
-    public ResponseEntity<List<DiaryResponse>> getDiariesByPlot(
+    public ResponseEntity<ApiResponse<List<DiaryResponse>>> getDiariesByPlot(
             @PathVariable UUID plotId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(voiceDiaryService.getDiariesByPlot(plotId, startDate, endDate));
+        return ResponseEntity.ok(ApiResponse.success(voiceDiaryService.getDiariesByPlot(plotId, startDate, endDate)));
     }
 
     @GetMapping("/{diaryId}")
     @Operation(summary = "Get diary by ID")
-    public ResponseEntity<DiaryResponse> getDiaryById(@PathVariable UUID diaryId) {
-        return ResponseEntity.ok(voiceDiaryService.getDiaryById(diaryId));
+    public ResponseEntity<ApiResponse<DiaryResponse>> getDiaryById(@PathVariable UUID diaryId) {
+        return ResponseEntity.ok(ApiResponse.success(voiceDiaryService.getDiaryById(diaryId)));
     }
 
     @PutMapping("/{diaryId}")
     @Operation(summary = "Update diary")
-    public ResponseEntity<DiaryResponse> updateDiary(
+    public ResponseEntity<ApiResponse<DiaryResponse>> updateDiary(
             @PathVariable UUID diaryId, @RequestBody CreateDiaryRequest request) {
-        return ResponseEntity.ok(voiceDiaryService.updateDiary(diaryId, request));
+        return ResponseEntity.ok(ApiResponse.success(voiceDiaryService.updateDiary(diaryId, request)));
     }
 
     @DeleteMapping("/{diaryId}")
     @Operation(summary = "Delete diary")
-    public ResponseEntity<SimpleResponse> deleteDiary(@PathVariable UUID diaryId) {
-        return ResponseEntity.ok(voiceDiaryService.deleteDiary(diaryId));
+    public ResponseEntity<ApiResponse<SimpleResponse>> deleteDiary(@PathVariable UUID diaryId) {
+        return ResponseEntity.ok(ApiResponse.success(voiceDiaryService.deleteDiary(diaryId)));
     }
 
     @GetMapping("/plot/{plotId}/profit")
     @Operation(summary = "Calculate profit")
-    public ResponseEntity<ProfitResponse> calculateProfit(
+    public ResponseEntity<ApiResponse<ProfitResponse>> calculateProfit(
             @PathVariable UUID plotId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(voiceDiaryService.calculateProfit(plotId, startDate, endDate));
+        return ResponseEntity.ok(ApiResponse.success(voiceDiaryService.calculateProfit(plotId, startDate, endDate)));
     }
 }

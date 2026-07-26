@@ -47,12 +47,36 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags
 
       # 4. Ra lệnh cho AWS Fargate tự động kéo Image mới về và cập nhật hệ thống
-      - name: Force new deployment on ECS Fargate
+      # - name: Force new deployment on ECS Fargate
+      #   if: github.ref == 'refs/heads/release'
+      #   run: |
+      #     aws ecs update-service ...
+      
+      # 4. Deploy to EC2 via SSH
+      - name: Deploy to EC2
         if: github.ref == 'refs/heads/release'
-        run: |
-          echo "Ra lệnh cho ECS cập nhật Service không làm gián đoạn người dùng (Rolling Update)..."
-          aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.ECS_SERVICE }} \
-            --force-new-deployment \
-            --region ${{ env.AWS_REGION }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Đăng nhập ECR từ trong EC2
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+            
+            # Tải image mới nhất
+            sudo docker pull ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            
+            # Dừng và xóa container cũ
+            sudo docker stop handgrow-backend || true
+            sudo docker rm handgrow-backend || true
+            
+            # Chạy container mới
+            sudo docker run -d --name handgrow-backend \
+              -p 8080:8080 \
+              --restart unless-stopped \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            
+            # Dọn dẹp image cũ để tiết kiệm dung lượng
+            sudo docker image prune -f
