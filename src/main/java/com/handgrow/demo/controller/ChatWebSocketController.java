@@ -2,10 +2,11 @@ package com.handgrow.demo.controller;
 
 import com.handgrow.demo.dto.request.CreateChatRoomRequest;
 import com.handgrow.demo.dto.request.SendChatMessageRequest;
+import com.handgrow.demo.dto.response.ApiResponse;
 import com.handgrow.demo.dto.response.ChatMessageResponse;
 import com.handgrow.demo.dto.response.ChatRoomResponse;
-import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.service.ChatService;
+import com.handgrow.demo.util.SecurityUtils;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -23,13 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class ChatWebSocketController {
 
     private final ChatService chatService;
-    private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Account not found"))
-                .getId();
+        return SecurityUtils.extractAccountId((org.springframework.security.core.Authentication) principal);
     }
 
     /**
@@ -48,33 +45,33 @@ public class ChatWebSocketController {
     // --- REST Endpoints for Chat History & Contract Management ---
 
     @PostMapping("/rooms")
-    public ResponseEntity<ChatRoomResponse> getOrCreateRoom(
+    public ResponseEntity<ApiResponse<ChatRoomResponse>> getOrCreateRoom(
             @RequestBody CreateChatRoomRequest request, Principal principal) {
         UUID accountId = getAccountId(principal);
-        return ResponseEntity.ok(chatService.getOrCreateRoom(accountId, request));
+        return ResponseEntity.ok(ApiResponse.success(chatService.getOrCreateRoom(accountId, request)));
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<ChatRoomResponse>> getMyRooms(Principal principal) {
+    public ResponseEntity<ApiResponse<List<ChatRoomResponse>>> getMyRooms(Principal principal) {
         UUID accountId = getAccountId(principal);
-        return ResponseEntity.ok(chatService.getMyRooms(accountId));
+        return ResponseEntity.ok(ApiResponse.success(chatService.getMyRooms(accountId)));
     }
 
     @GetMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<List<ChatMessageResponse>> getMessages(
+    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> getMessages(
             @PathVariable String roomId, Pageable pageable, Principal principal) { // THÊM PRINCIPAL VÀO ĐÂY
 
         UUID accountId = getAccountId(principal);
 
         // Xuống Service, bắt buộc phải check: accountId này CÓ QUYỀN vào roomId này không!
-        return ResponseEntity.ok(chatService.getMessages(roomId, accountId, pageable));
+        return ResponseEntity.ok(ApiResponse.success(chatService.getMessages(roomId, accountId, pageable)));
     }
 
     // A REST fallback exactly like how it used to be
     @PostMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<ChatMessageResponse> sendMessageRest(
+    public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessageRest(
             @PathVariable String roomId, @RequestBody SendChatMessageRequest request, Principal principal) {
         UUID accountId = getAccountId(principal);
-        return ResponseEntity.ok(chatService.sendMessage(roomId, accountId, request));
+        return ResponseEntity.ok(ApiResponse.success(chatService.sendMessage(roomId, accountId, request)));
     }
 }

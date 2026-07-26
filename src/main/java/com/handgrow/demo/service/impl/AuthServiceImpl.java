@@ -3,6 +3,8 @@ package com.handgrow.demo.service.impl;
 import com.handgrow.demo.dto.request.*;
 import com.handgrow.demo.dto.response.AuthResponse;
 import com.handgrow.demo.entity.*;
+import com.handgrow.demo.exception.AppException;
+import com.handgrow.demo.exception.ErrorCode;
 import com.handgrow.demo.repository.*;
 import com.handgrow.demo.service.AuthService;
 import com.handgrow.demo.util.JwtUtil;
@@ -32,12 +34,12 @@ public class AuthServiceImpl implements AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         } catch (Exception e) {
-            throw new RuntimeException("Invalid username or password");
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
 
         Account account = accountRepository
                 .findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         String accessToken =
                 jwtUtil.generateToken(account.getUsername(), account.getRole().getName());
@@ -54,10 +56,12 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public AuthResponse registerFarmer(FarmerRegisterRequest request) {
         if (accountRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        Role role = roleRepository.findByName("FARMER").orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = roleRepository
+                .findByName("FARMER")
+                .orElseThrow(() -> new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
 
         Account account = Account.builder()
                 .username(request.getUsername())
@@ -88,10 +92,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public AuthResponse registerCoop(CoopRegisterRequest request) {
         if (accountRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        Role role = roleRepository.findByName("COOP").orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role =
+                roleRepository.findByName("COOP").orElseThrow(() -> new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
 
         Account account = Account.builder()
                 .username(request.getUsername())
@@ -124,10 +129,12 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public AuthResponse registerEnterprise(EnterpriseRegisterRequest request) {
         if (accountRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        Role role = roleRepository.findByName("ENTERPRISE").orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = roleRepository
+                .findByName("ENTERPRISE")
+                .orElseThrow(() -> new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
 
         Account account = Account.builder()
                 .username(request.getUsername())

@@ -13,10 +13,12 @@ import com.handgrow.demo.entity.Farmer;
 import com.handgrow.demo.entity.FarmingDiary;
 import com.handgrow.demo.entity.Plot;
 import com.handgrow.demo.entity.enums.ActivityType;
+import com.handgrow.demo.exception.AppException;
+import com.handgrow.demo.exception.ErrorCode;
 import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.FarmingDiaryRepository;
 import com.handgrow.demo.repository.PlotRepository;
-import jakarta.transaction.Transactional;
+import com.handgrow.demo.service.VoiceDiaryService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Base64;
@@ -37,13 +39,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
-public class VoiceDiaryService {
+public class VoiceDiaryServiceImpl implements VoiceDiaryService {
 
     @Value("${gemini.api.key}")
     private String geminiApiKey;
@@ -154,13 +158,14 @@ public class VoiceDiaryService {
     @Transactional
     public DiaryResponse createDiary(String username, CreateDiaryRequest request) {
         Farmer farmer =
-                farmerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Farmer not found"));
+                farmerRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        Plot plot =
-                plotRepository.findById(request.getPlotId()).orElseThrow(() -> new RuntimeException("Plot not found"));
+        Plot plot = plotRepository
+                .findById(request.getPlotId())
+                .orElseThrow(() -> new AppException(ErrorCode.PLOT_NOT_FOUND));
 
         if (!plot.getFarmer().getId().equals(farmer.getId())) {
-            throw new RuntimeException("Plot does not belong to current farmer");
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
 
         FarmingDiary diary = FarmingDiary.builder()
@@ -204,7 +209,7 @@ public class VoiceDiaryService {
     @Transactional
     public DiaryResponse getDiaryById(UUID diaryId) {
         FarmingDiary diary =
-                diaryRepository.findById(diaryId).orElseThrow(() -> new RuntimeException("Diary not found"));
+                diaryRepository.findById(diaryId).orElseThrow(() -> new AppException(ErrorCode.DIARY_NOT_FOUND));
 
         return DiaryResponse.builder()
                 .id(diary.getId())
@@ -220,7 +225,7 @@ public class VoiceDiaryService {
     @Transactional
     public DiaryResponse updateDiary(UUID diaryId, CreateDiaryRequest request) {
         FarmingDiary diary =
-                diaryRepository.findById(diaryId).orElseThrow(() -> new RuntimeException("Diary not found"));
+                diaryRepository.findById(diaryId).orElseThrow(() -> new AppException(ErrorCode.DIARY_NOT_FOUND));
 
         diary.setActivityDate(request.getActivityDate());
         diary.setActivityType(request.getActivityType());

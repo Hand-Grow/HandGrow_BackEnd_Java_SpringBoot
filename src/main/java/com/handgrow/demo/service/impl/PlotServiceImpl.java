@@ -6,17 +6,19 @@ import com.handgrow.demo.entity.Farmer;
 import com.handgrow.demo.entity.Plot;
 import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.PlotRepository;
-import jakarta.transaction.Transactional;
+import com.handgrow.demo.service.PlotService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
-public class PlotService {
+public class PlotServiceImpl implements PlotService {
 
     private final PlotRepository plotRepository;
     private final FarmerRepository farmerRepository;

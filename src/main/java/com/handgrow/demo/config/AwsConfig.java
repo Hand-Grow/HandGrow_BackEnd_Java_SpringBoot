@@ -9,23 +9,22 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
-public class S3Config {
+public class AwsConfig {
 
-    @Value("${aws.credentials.access-key}")
+    @Value("${aws.s3.region:ap-southeast-1}")
+    private String region;
+
+    @Value("${aws.credentials.access-key:default}")
     private String accessKey;
 
-    @Value("${aws.credentials.secret-key}")
+    @Value("${aws.credentials.secret-key:default}")
     private String secretKey;
-
-    @Value("${aws.s3.region}")
-    private String region;
 
     @Bean
     public S3Presigner s3Presigner() {
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Presigner.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
                 .build();
     }
 }

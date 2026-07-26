@@ -6,8 +6,8 @@ import com.handgrow.demo.dto.response.CommitmentResponse;
 import com.handgrow.demo.dto.response.OfferResponse;
 import com.handgrow.demo.dto.response.SimpleResponse;
 import com.handgrow.demo.entity.enums.OfferStatus;
-import com.handgrow.demo.repository.AccountRepository;
 import com.handgrow.demo.service.MarketplaceService;
+import com.handgrow.demo.util.SecurityUtils;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -22,13 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class MarketplaceController {
 
     private final MarketplaceService marketplaceService;
-    private final AccountRepository accountRepository;
 
     private UUID getAccountId(Principal principal) {
-        return accountRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Account not found"))
-                .getId();
+        return SecurityUtils.extractAccountId((org.springframework.security.core.Authentication) principal);
     }
 
     @GetMapping("/bulk-sales")

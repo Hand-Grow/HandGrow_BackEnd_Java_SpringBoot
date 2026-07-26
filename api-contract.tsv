@@ -1,0 +1,708 @@
+Category	Method	Endpoint	Description	Auth/Public	Request Body	Responses
+voice-diary-controller	GET	/api/v1/voice-diary/{diaryId}	Get diary by ID	Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""plotName"": ""string"",
+  ""activityDate"": ""string"",
+  ""activityType"": ""string"",
+  ""expense"": {},
+  ""aiExtractedData"": ""string"",
+  ""originalTranscript"": ""string""
+}"
+voice-diary-controller	PUT	/api/v1/voice-diary/{diaryId}	Update diary	Public	Ref: CreateDiaryRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""plotName"": ""string"",
+  ""activityDate"": ""string"",
+  ""activityType"": ""string"",
+  ""expense"": {},
+  ""aiExtractedData"": ""string"",
+  ""originalTranscript"": ""string""
+}"
+voice-diary-controller	DELETE	/api/v1/voice-diary/{diaryId}	Delete diary	Public		"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+user-controller	GET	/api/v1/user/profile		Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""fullName"": ""string"",
+  ""username"": ""string"",
+  ""phoneNumber"": ""string"",
+  ""role"": ""string"",
+  ""avatarUrl"": ""string"",
+  ""address"": ""string"",
+  ""commune"": ""string"",
+  ""province"": ""string"",
+  ""produce"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""representativeName"": ""string""
+}"
+user-controller	PUT	/api/v1/user/profile		Public	Ref: UpdateProfileRequest	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+user-controller	PUT	/api/v1/user/location		Public	Ref: FarmerLocationUpdateDto	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+Sourcing Requests	PUT	/api/v1/sourcing-requests/{id}/status	Update sourcing request status	Public		"Status updated successfully (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Unauthorized (401):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Forbidden - Admin access required (403):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Sourcing request not found (404):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+Sourcing Requests	PUT	/api/v1/sourcing-requests/{id}/cancel	Cancel sourcing request	Public		"Request cancelled successfully (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Unauthorized (401):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Forbidden - Only owner can cancel (403):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Sourcing request not found (404):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Cannot cancel request in current status (400):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+campaign-controller	PUT	/api/v1/offers/{offerId}/reject		Public		"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+campaign-controller	PUT	/api/v1/offers/{offerId}/accept		Public		"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+join-request-controller	PUT	/api/v1/join-requests/{requestId}/respond		Public	Ref: JoinRequestResponseDto	"OK (200):
+{
+  ""id"": ""string"",
+  ""farmerName"": ""string"",
+  ""farmerPhone"": ""string"",
+  ""farmerAddress"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""status"": ""string"",
+  ""responseMessage"": ""string"",
+  ""createdAt"": ""string""
+}"
+campaign-controller	PUT	/api/v1/bulk-sales/{id}		Public	Ref: UpdateBulkSaleRequest	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+voice-diary-controller	POST	/api/v1/voice-diary	Create diary entry	Public	Ref: CreateDiaryRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""plotName"": ""string"",
+  ""activityDate"": ""string"",
+  ""activityType"": ""string"",
+  ""expense"": {},
+  ""aiExtractedData"": ""string"",
+  ""originalTranscript"": ""string""
+}"
+voice-diary-controller	POST	/api/v1/voice-diary/upload	Upload voice diary	Public	{audio}	"OK (200):
+{
+  ""status"": ""string"",
+  ""message"": ""string"",
+  ""transcription"": ""string""
+}"
+Sourcing Requests	GET	/api/v1/sourcing-requests	Get all sourcing requests	Public		"Successfully retrieved sourcing requests (200):
+{
+  ""totalElements"": 0,
+  ""totalPages"": 0,
+  ""pageable"": ""string"",
+  ""size"": 0,
+  ""content"": [],
+  ""number"": 0,
+  ""sort"": ""string"",
+  ""numberOfElements"": 0,
+  ""first"": true,
+  ""last"": true,
+  ""empty"": true
+}"
+Sourcing Requests	POST	/api/v1/sourcing-requests	Create a new sourcing request	Public	Ref: CreateSourcingRequest	"Sourcing request created successfully (201):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Invalid input data (400):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Unauthorized (401):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}
+
+Forbidden - Only enterprises can create requests (403):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+product-controller	GET	/api/v1/products		Public		OK (200):
+product-controller	POST	/api/v1/products		Public	Ref: CreateProductRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""name"": ""string"",
+  ""category"": ""string"",
+  ""unit"": ""string"",
+  ""basePrice"": {},
+  ""description"": ""string"",
+  ""imageUrl"": ""string"",
+  ""attributes"": {},
+  ""priceTiers"": []
+}"
+plot-controller	GET	/api/v1/plots	Get all plots for current farmer	Public		OK (200):
+plot-controller	POST	/api/v1/plots	Create a new plot	Public	Ref: CreatePlotRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""name"": ""string"",
+  ""location"": ""string"",
+  ""area"": {},
+  ""areaUnit"": ""string"",
+  ""createdAt"": ""string"",
+  ""updatedAt"": ""string""
+}"
+marketplace-controller	POST	/api/v1/marketplace/bulk-sales/{id}/offers		Public	Ref: CreateOfferRequest	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+join-request-controller	POST	/api/v1/join-requests		Public	Ref: JoinRequestDto	"OK (200):
+{
+  ""id"": ""string"",
+  ""farmerName"": ""string"",
+  ""farmerPhone"": ""string"",
+  ""farmerAddress"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""status"": ""string"",
+  ""responseMessage"": ""string"",
+  ""createdAt"": ""string""
+}"
+group-buy-controller	GET	/api/v1/group-buy/campaigns		Public		OK (200):
+group-buy-controller	POST	/api/v1/group-buy/campaigns		Public	Ref: CreateGroupBuyCampaignRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""productId"": ""string"",
+  ""productName"": ""string"",
+  ""productImageUrl"": ""string"",
+  ""title"": ""string"",
+  ""description"": ""string"",
+  ""status"": ""string"",
+  ""deadlineDate"": ""string"",
+  ""totalCommittedQty"": {},
+  ""currentUnitPrice"": {},
+  ""participationCount"": 0,
+  ""progressPercent"": {},
+  ""nextTierLabel"": ""string""
+}"
+group-buy-controller	POST	/api/v1/group-buy/campaigns/{id}/join		Public	Ref: JoinGroupBuyRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""productId"": ""string"",
+  ""productName"": ""string"",
+  ""productImageUrl"": ""string"",
+  ""title"": ""string"",
+  ""description"": ""string"",
+  ""status"": ""string"",
+  ""deadlineDate"": ""string"",
+  ""totalCommittedQty"": {},
+  ""currentUnitPrice"": {},
+  ""participationCount"": 0,
+  ""progressPercent"": {},
+  ""nextTierLabel"": ""string""
+}"
+group-buy-controller	POST	/api/v1/group-buy/campaigns/{id}/close		Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""productId"": ""string"",
+  ""productName"": ""string"",
+  ""productImageUrl"": ""string"",
+  ""title"": ""string"",
+  ""description"": ""string"",
+  ""status"": ""string"",
+  ""deadlineDate"": ""string"",
+  ""totalCommittedQty"": {},
+  ""currentUnitPrice"": {},
+  ""participationCount"": 0,
+  ""progressPercent"": {},
+  ""nextTierLabel"": ""string""
+}"
+feed-controller	POST	/api/v1/feed/{type}/{id}/likes		Public		"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+feed-controller	GET	/api/v1/feed/{type}/{id}/comments		Public		OK (200):
+feed-controller	POST	/api/v1/feed/{type}/{id}/comments		Public	Ref: CreateCommentRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""farmerName"": ""string"",
+  ""content"": ""string"",
+  ""createdAt"": ""string""
+}"
+campaign-controller	POST	/api/v1/coops/{coopId}/campaigns		Public	Ref: CreateCampaignRequest	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+campaign-controller	POST	/api/v1/coops/{coopId}/announcements		Public	Ref: CreateAnnouncementRequest	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+Contract	POST	/api/v1/contracts	Lưu hợp đồng chính thức vào PostgreSQL	Public	Ref: CreateContractRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""roomId"": ""string"",
+  ""bulkSaleId"": ""string"",
+  ""productName"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""cooperativeAddress"": ""string"",
+  ""cooperativePhone"": ""string"",
+  ""cooperativeRepresentative"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""enterpriseAddress"": ""string"",
+  ""enterprisePhone"": ""string"",
+  ""enterpriseTaxCode"": ""string"",
+  ""enterpriseRepresentative"": ""string"",
+  ""agreedPrice"": {},
+  ""agreedQuantity"": {},
+  ""deliveryDate"": ""string"",
+  ""terms"": ""string"",
+  ""documentUrl"": ""string"",
+  ""status"": ""string"",
+  ""createdAt"": ""string"",
+  ""updatedAt"": ""string"",
+  ""enterpriseSignatoryName"": ""string"",
+  ""enterpriseSigned"": true,
+  ""enterpriseSignedAt"": ""string""
+}"
+Contract	POST	/api/v1/contracts/room/{roomId}/enterprise-sign	Doanh nghiệp ký hợp đồng (đánh dấu đã ký)	Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""roomId"": ""string"",
+  ""bulkSaleId"": ""string"",
+  ""productName"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""cooperativeAddress"": ""string"",
+  ""cooperativePhone"": ""string"",
+  ""cooperativeRepresentative"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""enterpriseAddress"": ""string"",
+  ""enterprisePhone"": ""string"",
+  ""enterpriseTaxCode"": ""string"",
+  ""enterpriseRepresentative"": ""string"",
+  ""agreedPrice"": {},
+  ""agreedQuantity"": {},
+  ""deliveryDate"": ""string"",
+  ""terms"": ""string"",
+  ""documentUrl"": ""string"",
+  ""status"": ""string"",
+  ""createdAt"": ""string"",
+  ""updatedAt"": ""string"",
+  ""enterpriseSignatoryName"": ""string"",
+  ""enterpriseSigned"": true,
+  ""enterpriseSignedAt"": ""string""
+}"
+Contract	POST	/api/v1/contracts/ai-draft/{roomId}	AI tự động trích xuất thông tin hợp đồng từ lịch sử chat	Public		"OK (200):
+{
+  ""roomId"": ""string"",
+  ""bulkSaleId"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""productName"": ""string"",
+  ""quantity"": ""string"",
+  ""unitPrice"": ""string"",
+  ""deliveryDate"": ""string"",
+  ""deliveryLocation"": ""string"",
+  ""aiGenerated"": true
+}"
+chat-web-socket-controller	GET	/api/v1/chat/rooms		Public		OK (200):
+chat-web-socket-controller	POST	/api/v1/chat/rooms		Public	Ref: CreateChatRoomRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""bulkSaleId"": ""string"",
+  ""productName"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""cooperativeAvatarUrl"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""enterpriseAvatarUrl"": ""string"",
+  ""status"": ""string"",
+  ""createdAt"": ""string"",
+  ""updatedAt"": ""string""
+}"
+chat-web-socket-controller	GET	/api/v1/chat/rooms/{roomId}/messages		Public		OK (200):
+chat-web-socket-controller	POST	/api/v1/chat/rooms/{roomId}/messages		Public	Ref: SendChatMessageRequest	"OK (200):
+{
+  ""id"": ""string"",
+  ""senderId"": ""string"",
+  ""senderType"": ""string"",
+  ""senderName"": ""string"",
+  ""senderAvatarUrl"": ""string"",
+  ""content"": ""string"",
+  ""createdAt"": ""string""
+}"
+campaign-controller	POST	/api/v1/campaigns/{id}/publish-to-b2b		Public	Ref: PublishToB2BRequest	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+campaign-controller	GET	/api/v1/campaigns/{id}/commitments		Public		OK (200):
+campaign-controller	POST	/api/v1/campaigns/{id}/commitments		Public	Ref: CreateCommitmentRequest	"OK (200):
+{
+  ""status"": 0,
+  ""message"": ""string"",
+  ""success"": true,
+  ""data"": {}
+}"
+auth-controller	POST	/api/v1/auth/register/farmer		Public	Ref: FarmerRegisterRequest	"OK (200):
+{
+  ""accessToken"": ""string"",
+  ""refreshToken"": ""string"",
+  ""tokenType"": ""string"",
+  ""expiresIn"": 0
+}"
+auth-controller	POST	/api/v1/auth/register/enterprise		Public	Ref: EnterpriseRegisterRequest	"OK (200):
+{
+  ""accessToken"": ""string"",
+  ""refreshToken"": ""string"",
+  ""tokenType"": ""string"",
+  ""expiresIn"": 0
+}"
+auth-controller	POST	/api/v1/auth/register/coop		Public	Ref: CoopRegisterRequest	"OK (200):
+{
+  ""accessToken"": ""string"",
+  ""refreshToken"": ""string"",
+  ""tokenType"": ""string"",
+  ""expiresIn"": 0
+}"
+auth-controller	POST	/api/v1/auth/login		Public	Ref: LoginRequest	"OK (200):
+{
+  ""accessToken"": ""string"",
+  ""refreshToken"": ""string"",
+  ""tokenType"": ""string"",
+  ""expiresIn"": 0
+}"
+voice-diary-controller	GET	/api/v1/voice-diary/plot/{plotId}	Get diaries by plot	Public		OK (200):
+voice-diary-controller	GET	/api/v1/voice-diary/plot/{plotId}/profit	Calculate profit	Public		"OK (200):
+{
+  ""totalRevenue"": {},
+  ""totalExpense"": {},
+  ""profit"": {},
+  ""expenseBreakdown"": {}
+}"
+Sourcing Requests	GET	/api/v1/sourcing-requests/{id}	Get sourcing request by ID	Public		"Successfully retrieved sourcing request (200):
+{
+  ""id"": ""string"",
+  ""productName"": ""string"",
+  ""quantity"": {},
+  ""unit"": ""string"",
+  ""expectedPrice"": {},
+  ""deadline"": ""string"",
+  ""requirements"": ""string"",
+  ""status"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""createdAt"": ""string"",
+  ""updatedAt"": ""string""
+}
+
+Sourcing request not found (404):
+{
+  ""id"": ""string"",
+  ""productName"": ""string"",
+  ""quantity"": {},
+  ""unit"": ""string"",
+  ""expectedPrice"": {},
+  ""deadline"": ""string"",
+  ""requirements"": ""string"",
+  ""status"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""createdAt"": ""string"",
+  ""updatedAt"": ""string""
+}"
+Sourcing Requests	GET	/api/v1/sourcing-requests/search	Search sourcing requests	Public		"Successfully retrieved search results (200):
+{
+  ""totalElements"": 0,
+  ""totalPages"": 0,
+  ""pageable"": ""string"",
+  ""size"": 0,
+  ""content"": [],
+  ""number"": 0,
+  ""sort"": ""string"",
+  ""numberOfElements"": 0,
+  ""first"": true,
+  ""last"": true,
+  ""empty"": true
+}"
+Sourcing Requests	GET	/api/v1/sourcing-requests/open	Get open sourcing requests	Public		"Successfully retrieved open sourcing requests (200):
+{
+  ""totalElements"": 0,
+  ""totalPages"": 0,
+  ""pageable"": ""string"",
+  ""size"": 0,
+  ""content"": [],
+  ""number"": 0,
+  ""sort"": ""string"",
+  ""numberOfElements"": 0,
+  ""first"": true,
+  ""last"": true,
+  ""empty"": true
+}"
+Sourcing Requests	GET	/api/v1/sourcing-requests/my	Get my sourcing requests	Public		"Successfully retrieved my sourcing requests (200):
+{
+  ""totalElements"": 0,
+  ""totalPages"": 0,
+  ""pageable"": ""string"",
+  ""size"": 0,
+  ""content"": [],
+  ""number"": 0,
+  ""sort"": ""string"",
+  ""numberOfElements"": 0,
+  ""first"": true,
+  ""last"": true,
+  ""empty"": true
+}
+
+Unauthorized (401):
+{
+  ""totalElements"": 0,
+  ""totalPages"": 0,
+  ""pageable"": ""string"",
+  ""size"": 0,
+  ""content"": [],
+  ""number"": 0,
+  ""sort"": ""string"",
+  ""numberOfElements"": 0,
+  ""first"": true,
+  ""last"": true,
+  ""empty"": true
+}
+
+Forbidden - Only enterprises can access (403):
+{
+  ""totalElements"": 0,
+  ""totalPages"": 0,
+  ""pageable"": ""string"",
+  ""size"": 0,
+  ""content"": [],
+  ""number"": 0,
+  ""sort"": ""string"",
+  ""numberOfElements"": 0,
+  ""first"": true,
+  ""last"": true,
+  ""empty"": true
+}"
+product-controller	GET	/api/v1/products/{id}		Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""name"": ""string"",
+  ""category"": ""string"",
+  ""unit"": ""string"",
+  ""basePrice"": {},
+  ""description"": ""string"",
+  ""imageUrl"": ""string"",
+  ""attributes"": {},
+  ""priceTiers"": []
+}"
+product-controller	GET	/api/v1/products/enterprise/me		Public		OK (200):
+marketplace-controller	GET	/api/v1/marketplace/enterprises/me/offers		Public		OK (200):
+marketplace-controller	GET	/api/v1/marketplace/bulk-sales		Public		OK (200):
+marketplace-controller	GET	/api/v1/marketplace/bulk-sales/{id}		Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""campaignId"": ""string"",
+  ""productName"": ""string"",
+  ""totalQuantity"": {},
+  ""expectedPrice"": {},
+  ""status"": ""string"",
+  ""coopName"": ""string"",
+  ""attachments"": [],
+  ""createdAt"": ""string""
+}"
+marketplace-controller	GET	/api/v1/marketplace/bulk-sales/{id}/commitments		Public		OK (200):
+join-request-controller	GET	/api/v1/join-requests/status/{status}		Public		OK (200):
+join-request-controller	GET	/api/v1/join-requests/my-requests		Public		OK (200):
+join-request-controller	GET	/api/v1/join-requests/my-requests/status/{status}		Public		OK (200):
+join-request-controller	GET	/api/v1/join-requests/all		Public		OK (200):
+group-buy-controller	GET	/api/v1/group-buy/campaigns/{id}		Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""productId"": ""string"",
+  ""productName"": ""string"",
+  ""productImageUrl"": ""string"",
+  ""title"": ""string"",
+  ""description"": ""string"",
+  ""status"": ""string"",
+  ""deadlineDate"": ""string"",
+  ""totalCommittedQty"": {},
+  ""currentUnitPrice"": {},
+  ""participationCount"": 0,
+  ""progressPercent"": {},
+  ""nextTierLabel"": ""string""
+}"
+group-buy-controller	GET	/api/v1/group-buy/campaigns/{id}/participations		Public		OK (200):
+group-buy-controller	GET	/api/v1/group-buy/campaigns/{id}/participations/me		Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""farmerId"": ""string"",
+  ""farmerName"": ""string"",
+  ""committedQty"": {},
+  ""lockedUnitPrice"": {},
+  ""totalAmount"": {}
+}"
+group-buy-controller	GET	/api/v1/group-buy/campaigns/cooperative/me		Public		OK (200):
+file-upload-controller	GET	/api/v1/files/presigned-url		Public		"OK (200):
+{
+  ""presignedUrl"": ""string"",
+  ""publicUrl"": ""string""
+}"
+debug-controller	GET	/api/v1/debug/rooms		Public		OK (200):
+debug-controller	GET	/api/v1/debug/messages		Public		OK (200):
+feed-controller	GET	/api/v1/coops/{coopId}/feed	Get newsfeed	Public		OK (200):
+cooperative-controller	GET	/api/v1/cooperatives		Public		OK (200):
+cooperative-controller	GET	/api/v1/cooperatives/search		Public		OK (200):
+Contract	GET	/api/v1/contracts/room/{roomId}	Lấy hợp đồng điện tử theo phòng chat	Public		"OK (200):
+{
+  ""id"": ""string"",
+  ""roomId"": ""string"",
+  ""bulkSaleId"": ""string"",
+  ""productName"": ""string"",
+  ""cooperativeId"": ""string"",
+  ""cooperativeName"": ""string"",
+  ""cooperativeAddress"": ""string"",
+  ""cooperativePhone"": ""string"",
+  ""cooperativeRepresentative"": ""string"",
+  ""enterpriseId"": ""string"",
+  ""enterpriseName"": ""string"",
+  ""enterpriseAddress"": ""string"",
+  ""enterprisePhone"": ""string"",
+  ""enterpriseTaxCode"": ""string"",
+  ""enterpriseRepresentative"": ""string"",
+  ""agreedPrice"": {},
+  ""agreedQuantity"": {},
+  ""deliveryDate"": ""string"",
+  ""terms"": ""string"",
+  ""documentUrl"": ""string"",
+  ""status"": ""string"",
+  ""createdAt"": ""string"",
+  ""updatedAt"": ""string"",
+  ""enterpriseSignatoryName"": ""string"",
+  ""enterpriseSigned"": true,
+  ""enterpriseSignedAt"": ""string""
+}"
+Contract	GET	/api/v1/contracts/room/{roomId}/pdf	Tải xuống hợp đồng PDF cho phòng chat (roomId)	Public		OK (200):
+Contract	GET	/api/v1/contracts/my	Lấy danh sách hợp đồng của tôi	Public		OK (200):
+campaign-controller	GET	/api/v1/bulk-sales/{id}/offers		Public		OK (200):

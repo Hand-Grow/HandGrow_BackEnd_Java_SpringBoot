@@ -3,6 +3,7 @@ package com.handgrow.demo.service.impl;
 import com.handgrow.demo.dto.request.CooperativeSearchDto;
 import com.handgrow.demo.dto.response.CooperativeResponse;
 import com.handgrow.demo.entity.Cooperative;
+import com.handgrow.demo.mapper.CooperativeMapper;
 import com.handgrow.demo.repository.CooperativeRepository;
 import com.handgrow.demo.service.CooperativeService;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CooperativeServiceImpl implements CooperativeService {
 
     private final CooperativeRepository cooperativeRepository;
+    private final CooperativeMapper cooperativeMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -45,31 +47,13 @@ public class CooperativeServiceImpl implements CooperativeService {
             cooperatives = cooperativeRepository.findAllOrderByMemberCount();
         }
 
-        return cooperatives.stream().map(this::buildCooperativeResponse).collect(Collectors.toList());
+        return cooperatives.stream().map(cooperativeMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CooperativeResponse> getAllCooperatives() {
         List<Cooperative> cooperatives = cooperativeRepository.findAllOrderByMemberCount();
-        return cooperatives.stream().map(this::buildCooperativeResponse).collect(Collectors.toList());
-    }
-
-    private CooperativeResponse buildCooperativeResponse(Cooperative cooperative) {
-        return CooperativeResponse.builder()
-                .id(cooperative.getId().toString())
-                .name(cooperative.getName())
-                .phoneNumber(cooperative.getPhoneNumber())
-                .commune(cooperative.getCommune())
-                .province(cooperative.getProvince())
-                .produce(
-                        cooperative.getProduce() != null
-                                ? cooperative.getProduce().name()
-                                : null)
-                .memberCount(
-                        cooperative.getMembers() != null
-                                ? cooperative.getMembers().size()
-                                : 0)
-                .build();
+        return cooperatives.stream().map(cooperativeMapper::toResponse).collect(Collectors.toList());
     }
 }

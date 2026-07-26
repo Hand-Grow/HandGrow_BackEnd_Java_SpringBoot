@@ -1,0 +1,4340 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Documentation",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Sourcing Requests",
+      "description": "API for managing sourcing requests"
+    },
+    {
+      "name": "Contract",
+      "description": "API quản lý hợp đồng điện tử và AI drafting"
+    }
+  ],
+  "paths": {
+    "/api/v1/voice-diary/{diaryId}": {
+      "get": {
+        "tags": [
+          "voice-diary-controller"
+        ],
+        "summary": "Get diary by ID",
+        "operationId": "getDiaryById",
+        "parameters": [
+          {
+            "name": "diaryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiaryResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "voice-diary-controller"
+        ],
+        "summary": "Update diary",
+        "operationId": "updateDiary",
+        "parameters": [
+          {
+            "name": "diaryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDiaryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiaryResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "voice-diary-controller"
+        ],
+        "summary": "Delete diary",
+        "operationId": "deleteDiary",
+        "parameters": [
+          {
+            "name": "diaryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/profile": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getUserProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "updateProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/location": {
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "updateFarmerLocation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FarmerLocationUpdateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sourcing-requests/{id}/status": {
+      "put": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Update sourcing request status",
+        "description": "Updates the status of a sourcing request (Admin only)",
+        "operationId": "updateSourcingRequestStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the sourcing request",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "New status",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OPEN",
+                "IN_PROGRESS",
+                "COMPLETED",
+                "CANCELLED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Admin access required",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sourcing request not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sourcing-requests/{id}/cancel": {
+      "put": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Cancel sourcing request",
+        "description": "Cancels a sourcing request (only by the owner enterprise)",
+        "operationId": "cancelSourcingRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the sourcing request to cancel",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request cancelled successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Only owner can cancel",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sourcing request not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot cancel request in current status",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/offers/{offerId}/reject": {
+      "put": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "rejectOffer",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/offers/{offerId}/accept": {
+      "put": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "acceptOffer",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/join-requests/{requestId}/respond": {
+      "put": {
+        "tags": [
+          "join-request-controller"
+        ],
+        "operationId": "respondToRequest",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinRequestResponseDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bulk-sales/{id}": {
+      "put": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "updateBulkSale",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBulkSaleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/voice-diary": {
+      "post": {
+        "tags": [
+          "voice-diary-controller"
+        ],
+        "summary": "Create diary entry",
+        "operationId": "createDiary",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDiaryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/voice-diary/upload": {
+      "post": {
+        "tags": [
+          "voice-diary-controller"
+        ],
+        "summary": "Upload voice diary",
+        "description": "Upload MP3 audio file to convert to diary entry",
+        "operationId": "uploadVoiceDiary",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "audio": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Audio file (MP3, WAV, etc.)"
+                  }
+                },
+                "required": [
+                  "audio"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceDiaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sourcing-requests": {
+      "get": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Get all sourcing requests",
+        "description": "Retrieves all sourcing requests with pagination",
+        "operationId": "getAllSourcingRequests",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved sourcing requests",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageSourcingRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Create a new sourcing request",
+        "description": "Creates a new sourcing request for enterprises to find suppliers",
+        "operationId": "createSourcingRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSourcingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Sourcing request created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Only enterprises can create requests",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/products": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "getAllProducts",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "createProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plots": {
+      "get": {
+        "tags": [
+          "plot-controller"
+        ],
+        "summary": "Get all plots for current farmer",
+        "operationId": "getMyPlots",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlotResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "plot-controller"
+        ],
+        "summary": "Create a new plot",
+        "operationId": "createPlot",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlotRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlotResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/marketplace/bulk-sales/{id}/offers": {
+      "post": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "createOffer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOfferRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/join-requests": {
+      "post": {
+        "tags": [
+          "join-request-controller"
+        ],
+        "operationId": "createJoinRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/group-buy/campaigns": {
+      "get": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "getAllCampaigns",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupBuyCampaignResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "createCampaign",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroupBuyCampaignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupBuyCampaignResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/group-buy/campaigns/{id}/join": {
+      "post": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "joinCampaign",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinGroupBuyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupBuyCampaignResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/group-buy/campaigns/{id}/close": {
+      "post": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "closeCampaign",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupBuyCampaignResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/feed/{type}/{id}/likes": {
+      "post": {
+        "tags": [
+          "feed-controller"
+        ],
+        "operationId": "toggleLike",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/feed/{type}/{id}/comments": {
+      "get": {
+        "tags": [
+          "feed-controller"
+        ],
+        "operationId": "getComments",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommentResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "feed-controller"
+        ],
+        "operationId": "addComment",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/coops/{coopId}/campaigns": {
+      "post": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "createCampaign_1",
+        "parameters": [
+          {
+            "name": "coopId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCampaignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/coops/{coopId}/announcements": {
+      "post": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "createAnnouncement",
+        "parameters": [
+          {
+            "name": "coopId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnnouncementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts": {
+      "post": {
+        "tags": [
+          "Contract"
+        ],
+        "summary": "Lưu hợp đồng chính thức vào PostgreSQL",
+        "description": "Sau khi HTX đã kiểm tra và sửa thông tin trên form, gọi endpoint này để lưu hợp đồng điện tử. Yêu cầu JWT Authentication.",
+        "operationId": "saveContract",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectronicContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/room/{roomId}/enterprise-sign": {
+      "post": {
+        "tags": [
+          "Contract"
+        ],
+        "summary": "Doanh nghiệp ký hợp đồng (đánh dấu đã ký)",
+        "operationId": "enterpriseSign",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectronicContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/ai-draft/{roomId}": {
+      "post": {
+        "tags": [
+          "Contract"
+        ],
+        "summary": "AI tự động trích xuất thông tin hợp đồng từ lịch sử chat",
+        "description": "Đọc 50 tin nhắn gần nhất trong phòng chat, gửi lên Gemini AI để phân tích, trả về JSON pre-filled. Nếu Gemini không sẵn sàng, fallback dữ liệu từ BulkSale. Yêu cầu JWT Authentication.",
+        "operationId": "aiDraft",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chat/rooms": {
+      "get": {
+        "tags": [
+          "chat-web-socket-controller"
+        ],
+        "operationId": "getMyRooms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChatRoomResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "chat-web-socket-controller"
+        ],
+        "operationId": "getOrCreateRoom",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChatRoomRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatRoomResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chat/rooms/{roomId}/messages": {
+      "get": {
+        "tags": [
+          "chat-web-socket-controller"
+        ],
+        "operationId": "getMessages",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChatMessageResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "chat-web-socket-controller"
+        ],
+        "operationId": "sendMessageRest",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendChatMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{id}/publish-to-b2b": {
+      "post": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "publishToB2B",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishToB2BRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{id}/commitments": {
+      "get": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "getCommitments",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommitmentResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "addCommitment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommitmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register/farmer": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "registerFarmer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FarmerRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register/enterprise": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "registerEnterprise",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnterpriseRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register/coop": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "registerCoop",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoopRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/voice-diary/plot/{plotId}": {
+      "get": {
+        "tags": [
+          "voice-diary-controller"
+        ],
+        "summary": "Get diaries by plot",
+        "operationId": "getDiariesByPlot",
+        "parameters": [
+          {
+            "name": "plotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DiaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/voice-diary/plot/{plotId}/profit": {
+      "get": {
+        "tags": [
+          "voice-diary-controller"
+        ],
+        "summary": "Calculate profit",
+        "operationId": "calculateProfit",
+        "parameters": [
+          {
+            "name": "plotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfitResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sourcing-requests/{id}": {
+      "get": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Get sourcing request by ID",
+        "description": "Retrieves a specific sourcing request by its ID",
+        "operationId": "getSourcingRequestById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the sourcing request to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved sourcing request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourcingRequestResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sourcing request not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourcingRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sourcing-requests/search": {
+      "get": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Search sourcing requests",
+        "description": "Search sourcing requests by product name and/or status",
+        "operationId": "searchSourcingRequests",
+        "parameters": [
+          {
+            "name": "productName",
+            "in": "query",
+            "description": "Product name to search for",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Status filter (OPEN, IN_PROGRESS, COMPLETED, CANCELLED)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort parameter (format: field,direction)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved search results",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageSourcingRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sourcing-requests/open": {
+      "get": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Get open sourcing requests",
+        "description": "Retrieves all open sourcing requests with pagination",
+        "operationId": "getOpenSourcingRequests",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved open sourcing requests",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageSourcingRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sourcing-requests/my": {
+      "get": {
+        "tags": [
+          "Sourcing Requests"
+        ],
+        "summary": "Get my sourcing requests",
+        "description": "Retrieves sourcing requests created by the authenticated enterprise",
+        "operationId": "getMySourcingRequests",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved my sourcing requests",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageSourcingRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageSourcingRequestResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Only enterprises can access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageSourcingRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/products/{id}": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "getProductById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/products/enterprise/me": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "getMyProducts",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/marketplace/enterprises/me/offers": {
+      "get": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "getMyOffers",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OfferResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/marketplace/bulk-sales": {
+      "get": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "searchBulkSales",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BulkSaleResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/marketplace/bulk-sales/{id}": {
+      "get": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "getBulkSaleDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkSaleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/marketplace/bulk-sales/{id}/commitments": {
+      "get": {
+        "tags": [
+          "marketplace-controller"
+        ],
+        "operationId": "getCommitmentsByBulkSale",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommitmentResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/join-requests/status/{status}": {
+      "get": {
+        "tags": [
+          "join-request-controller"
+        ],
+        "operationId": "getRequestsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JoinRequestResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/join-requests/my-requests": {
+      "get": {
+        "tags": [
+          "join-request-controller"
+        ],
+        "operationId": "getMyRequests",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JoinRequestResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/join-requests/my-requests/status/{status}": {
+      "get": {
+        "tags": [
+          "join-request-controller"
+        ],
+        "operationId": "getFarmerRequestsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JoinRequestResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/join-requests/all": {
+      "get": {
+        "tags": [
+          "join-request-controller"
+        ],
+        "operationId": "getAllRequests",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JoinRequestResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/group-buy/campaigns/{id}": {
+      "get": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "getCampaignById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupBuyCampaignResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/group-buy/campaigns/{id}/participations": {
+      "get": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "getParticipations",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupBuyParticipationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/group-buy/campaigns/{id}/participations/me": {
+      "get": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "getMyParticipation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupBuyParticipationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/group-buy/campaigns/cooperative/me": {
+      "get": {
+        "tags": [
+          "group-buy-controller"
+        ],
+        "operationId": "getMyCampaigns",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupBuyCampaignResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/presigned-url": {
+      "get": {
+        "tags": [
+          "file-upload-controller"
+        ],
+        "operationId": "getPresignedUrl",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contentType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresignedUrlResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/debug/rooms": {
+      "get": {
+        "tags": [
+          "debug-controller"
+        ],
+        "operationId": "getAllRooms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MongoChatRoom"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/debug/messages": {
+      "get": {
+        "tags": [
+          "debug-controller"
+        ],
+        "operationId": "getAllMessages",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MongoChatMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/coops/{coopId}/feed": {
+      "get": {
+        "tags": [
+          "feed-controller"
+        ],
+        "summary": "Get newsfeed",
+        "description": "Get announcements and campaigns feed",
+        "operationId": "getFeed",
+        "parameters": [
+          {
+            "name": "coopId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ANNOUNCEMENT",
+                "CAMPAIGN",
+                "BULK_SALE"
+              ]
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (starts from 0)",
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Page size",
+            "example": 10
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort by field,direction (e.g. createdAt,desc)",
+            "example": "createdAt,desc"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeedItemResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cooperatives": {
+      "get": {
+        "tags": [
+          "cooperative-controller"
+        ],
+        "operationId": "getAllCooperatives",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CooperativeResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cooperatives/search": {
+      "get": {
+        "tags": [
+          "cooperative-controller"
+        ],
+        "operationId": "searchCooperatives",
+        "parameters": [
+          {
+            "name": "commune",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "province",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "produce",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "RICE",
+                "CORN",
+                "VEGETABLES",
+                "FRUITS",
+                "COFFEE",
+                "TEA",
+                "RUBBER",
+                "SUGARCANE",
+                "CASSAVA",
+                "PEPPER",
+                "COCONUT",
+                "CASHEW",
+                "AQUACULTURE",
+                "LIVESTOCK",
+                "OTHER"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CooperativeResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/room/{roomId}": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "summary": "Lấy hợp đồng điện tử theo phòng chat",
+        "description": "Trả về hợp đồng đã được lưu trước đó cho roomId này. Yêu cầu JWT Authentication.",
+        "operationId": "getContractByRoom",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectronicContractResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/room/{roomId}/pdf": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "summary": "Tải xuống hợp đồng PDF cho phòng chat (roomId)",
+        "operationId": "getContractPdf",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contracts/my": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "summary": "Lấy danh sách hợp đồng của tôi",
+        "description": "Trả về danh sách hợp đồng của HTX hoặc Doanh nghiệp đang đăng nhập. Yêu cầu JWT Authentication.",
+        "operationId": "getMyContracts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ElectronicContractResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bulk-sales/{id}/offers": {
+      "get": {
+        "tags": [
+          "campaign-controller"
+        ],
+        "operationId": "getOffers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OfferResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateDiaryRequest": {
+        "type": "object",
+        "properties": {
+          "plotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activityDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "WATERING",
+              "FERTILIZING",
+              "PESTICIDE",
+              "PLANTING",
+              "HARVESTING",
+              "WEEDING"
+            ]
+          },
+          "expense": {
+            "type": "number"
+          },
+          "aiExtractedData": {
+            "type": "string"
+          },
+          "originalTranscript": {
+            "type": "string"
+          }
+        }
+      },
+      "DiaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plotName": {
+            "type": "string"
+          },
+          "activityDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "WATERING",
+              "FERTILIZING",
+              "PESTICIDE",
+              "PLANTING",
+              "HARVESTING",
+              "WEEDING"
+            ]
+          },
+          "expense": {
+            "type": "number"
+          },
+          "aiExtractedData": {
+            "type": "string"
+          },
+          "originalTranscript": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "commune": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "representativeName": {
+            "type": "string"
+          },
+          "contactEmail": {
+            "type": "string"
+          }
+        }
+      },
+      "SimpleResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "FarmerLocationUpdateDto": {
+        "type": "object",
+        "properties": {
+          "commune": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          }
+        }
+      },
+      "JoinRequestResponseDto": {
+        "type": "object",
+        "properties": {
+          "responseMessage": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "boolean"
+          }
+        }
+      },
+      "JoinRequestResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "farmerName": {
+            "type": "string"
+          },
+          "farmerPhone": {
+            "type": "string"
+          },
+          "farmerAddress": {
+            "type": "string"
+          },
+          "cooperativeName": {
+            "type": "string"
+          },
+          "cooperativeId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "responseMessage": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateBulkSaleRequest": {
+        "type": "object",
+        "properties": {
+          "expectedPrice": {
+            "type": "number"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "VoiceDiaryResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "transcription": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateSourcingRequest": {
+        "type": "object",
+        "description": "Request DTO for creating a new sourcing request",
+        "properties": {
+          "productName": {
+            "type": "string",
+            "description": "Name of the product to source",
+            "example": "Cà phê Arabica"
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double",
+            "description": "Quantity needed",
+            "example": 1000
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of measurement",
+            "enum": [
+              "kg",
+              "tấn"
+            ],
+            "example": "kg"
+          },
+          "expectedPrice": {
+            "type": "number",
+            "description": "Expected price in VND",
+            "example": 50000
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date",
+            "description": "Deadline for the sourcing request",
+            "example": "2024-12-31"
+          },
+          "requirements": {
+            "type": "string",
+            "description": "Additional requirements",
+            "example": "Chất lượng cao, không thuốc trừ sâu"
+          }
+        },
+        "required": [
+          "deadline",
+          "productName",
+          "quantity",
+          "unit"
+        ]
+      },
+      "CreateProductRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "FERTILIZER",
+              "SEED",
+              "PESTICIDE",
+              "OTHER"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "basePrice": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "priceTiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PriceTierDto"
+            }
+          }
+        }
+      },
+      "PriceTierDto": {
+        "type": "object",
+        "properties": {
+          "minQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "PriceTierResponse": {
+        "type": "object",
+        "properties": {
+          "minQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "enterpriseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "enterpriseName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "FERTILIZER",
+              "SEED",
+              "PESTICIDE",
+              "OTHER"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "basePrice": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "priceTiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PriceTierResponse"
+            }
+          }
+        }
+      },
+      "CreatePlotRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "area": {
+            "type": "number",
+            "format": "double"
+          },
+          "areaUnit": {
+            "type": "string"
+          }
+        }
+      },
+      "PlotResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "area": {
+            "type": "number",
+            "format": "double"
+          },
+          "areaUnit": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateOfferRequest": {
+        "type": "object",
+        "properties": {
+          "offeredPrice": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "JoinRequestDto": {
+        "type": "object",
+        "properties": {
+          "cooperativeId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateGroupBuyCampaignRequest": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "deadlineDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "GroupBuyCampaignResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cooperativeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cooperativeName": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "productImageUrl": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "GATHERING",
+              "CLOSED",
+              "ORDERED"
+            ]
+          },
+          "deadlineDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "totalCommittedQty": {
+            "type": "number"
+          },
+          "currentUnitPrice": {
+            "type": "number"
+          },
+          "participationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "progressPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "nextTierLabel": {
+            "type": "string"
+          }
+        }
+      },
+      "JoinGroupBuyRequest": {
+        "type": "object",
+        "properties": {
+          "committedQty": {
+            "type": "number"
+          }
+        }
+      },
+      "CreateCommentRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "CommentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "farmerName": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCampaignRequest": {
+        "type": "object",
+        "properties": {
+          "productName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "CreateAnnouncementRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateContractRequest": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string"
+          },
+          "agreedQuantity": {
+            "type": "number"
+          },
+          "agreedPrice": {
+            "type": "number"
+          },
+          "deliveryDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "terms": {
+            "type": "string"
+          },
+          "deliveryLocation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "agreedPrice",
+          "agreedQuantity",
+          "deliveryDate",
+          "roomId"
+        ]
+      },
+      "ElectronicContractResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomId": {
+            "type": "string"
+          },
+          "bulkSaleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "cooperativeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cooperativeName": {
+            "type": "string"
+          },
+          "cooperativeAddress": {
+            "type": "string"
+          },
+          "cooperativePhone": {
+            "type": "string"
+          },
+          "cooperativeRepresentative": {
+            "type": "string"
+          },
+          "enterpriseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "enterpriseName": {
+            "type": "string"
+          },
+          "enterpriseAddress": {
+            "type": "string"
+          },
+          "enterprisePhone": {
+            "type": "string"
+          },
+          "enterpriseTaxCode": {
+            "type": "string"
+          },
+          "enterpriseRepresentative": {
+            "type": "string"
+          },
+          "agreedPrice": {
+            "type": "number"
+          },
+          "agreedQuantity": {
+            "type": "number"
+          },
+          "deliveryDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "terms": {
+            "type": "string"
+          },
+          "documentUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_ENTERPRISE_SIGNATURE",
+              "PENDING_COOP_SIGNATURE",
+              "COMPLETED",
+              "CANCELLED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "enterpriseSignatoryName": {
+            "type": "string"
+          },
+          "enterpriseSigned": {
+            "type": "boolean"
+          },
+          "enterpriseSignedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DraftContractResponse": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string"
+          },
+          "bulkSaleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cooperativeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "enterpriseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "unitPrice": {
+            "type": "string"
+          },
+          "deliveryDate": {
+            "type": "string"
+          },
+          "deliveryLocation": {
+            "type": "string"
+          },
+          "aiGenerated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateChatRoomRequest": {
+        "type": "object",
+        "properties": {
+          "bulkSaleId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ChatRoomResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "bulkSaleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "cooperativeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cooperativeName": {
+            "type": "string"
+          },
+          "cooperativeAvatarUrl": {
+            "type": "string"
+          },
+          "enterpriseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "enterpriseName": {
+            "type": "string"
+          },
+          "enterpriseAvatarUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SendChatMessageRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "senderType": {
+            "type": "string"
+          }
+        }
+      },
+      "ChatMessageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "senderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "senderType": {
+            "type": "string"
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "senderAvatarUrl": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PublishToB2BRequest": {
+        "type": "object",
+        "properties": {
+          "expectedPrice": {
+            "type": "number"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateCommitmentRequest": {
+        "type": "object",
+        "properties": {
+          "plotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "committedQuantity": {
+            "type": "number"
+          }
+        }
+      },
+      "FarmerRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "produce": {
+            "type": "string",
+            "enum": [
+              "RICE",
+              "CORN",
+              "VEGETABLES",
+              "FRUITS",
+              "COFFEE",
+              "TEA",
+              "RUBBER",
+              "SUGARCANE",
+              "CASSAVA",
+              "PEPPER",
+              "COCONUT",
+              "CASHEW",
+              "AQUACULTURE",
+              "LIVESTOCK",
+              "OTHER"
+            ]
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "tokenType": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "EnterpriseRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "commune": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          }
+        }
+      },
+      "CoopRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "commune": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "produce": {
+            "type": "string",
+            "enum": [
+              "RICE",
+              "CORN",
+              "VEGETABLES",
+              "FRUITS",
+              "COFFEE",
+              "TEA",
+              "RUBBER",
+              "SUGARCANE",
+              "CASSAVA",
+              "PEPPER",
+              "COCONUT",
+              "CASHEW",
+              "AQUACULTURE",
+              "LIVESTOCK",
+              "OTHER"
+            ]
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ProfitResponse": {
+        "type": "object",
+        "properties": {
+          "totalRevenue": {
+            "type": "number"
+          },
+          "totalExpense": {
+            "type": "number"
+          },
+          "profit": {
+            "type": "number"
+          },
+          "expenseBreakdown": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "commune": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "produce": {
+            "type": "string"
+          },
+          "cooperativeId": {
+            "type": "string"
+          },
+          "cooperativeName": {
+            "type": "string"
+          },
+          "representativeName": {
+            "type": "string"
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PageSourcingRequestResponse": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourcingRequestResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "paged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SourcingRequestResponse": {
+        "type": "object",
+        "description": "Response DTO for sourcing request",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier of the sourcing request"
+          },
+          "productName": {
+            "type": "string",
+            "description": "Name of the product to source"
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double",
+            "description": "Quantity needed"
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of measurement"
+          },
+          "expectedPrice": {
+            "type": "number",
+            "description": "Expected price in VND"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date",
+            "description": "Deadline for the sourcing request"
+          },
+          "requirements": {
+            "type": "string",
+            "description": "Additional requirements"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the request"
+          },
+          "enterpriseId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Enterprise ID who created the request"
+          },
+          "enterpriseName": {
+            "type": "string",
+            "description": "Enterprise name who created the request"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "OfferResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "enterpriseName": {
+            "type": "string"
+          },
+          "offeredPrice": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "REJECTED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BulkSaleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "campaignId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "totalQuantity": {
+            "type": "number"
+          },
+          "expectedPrice": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "NEGOTIATING",
+              "SOLD",
+              "CANCELLED"
+            ]
+          },
+          "coopName": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CommitmentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "farmerName": {
+            "type": "string"
+          },
+          "plotName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GroupBuyParticipationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "farmerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "farmerName": {
+            "type": "string"
+          },
+          "committedQty": {
+            "type": "number"
+          },
+          "lockedUnitPrice": {
+            "type": "number"
+          },
+          "totalAmount": {
+            "type": "number"
+          }
+        }
+      },
+      "PresignedUrlResponse": {
+        "type": "object",
+        "properties": {
+          "presignedUrl": {
+            "type": "string"
+          },
+          "publicUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "MongoChatRoom": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "bulkSaleId": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "cooperativeId": {
+            "type": "string"
+          },
+          "cooperativeName": {
+            "type": "string"
+          },
+          "enterpriseId": {
+            "type": "string"
+          },
+          "enterpriseName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MongoChatMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "roomId": {
+            "type": "string"
+          },
+          "senderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "senderType": {
+            "type": "string"
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "senderAvatarUrl": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "FeedItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ANNOUNCEMENT",
+              "CAMPAIGN",
+              "BULK_SALE"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "productName": {
+            "type": "string"
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "liked": {
+            "type": "boolean"
+          },
+          "published": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CooperativeResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "commune": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "produce": {
+            "type": "string"
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

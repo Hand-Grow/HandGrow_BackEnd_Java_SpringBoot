@@ -21,6 +21,7 @@ import com.handgrow.demo.repository.EnterpriseRepository;
 import com.handgrow.demo.repository.FarmerRepository;
 import com.handgrow.demo.repository.MongoChatMessageRepository;
 import com.handgrow.demo.repository.MongoChatRoomRepository;
+import com.handgrow.demo.service.AiContractService;
 import com.handgrow.demo.service.ContractService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,7 +46,7 @@ public class ContractServiceImpl implements ContractService {
     private final ElectronicContractRepository contractRepository;
     private final AccountRepository accountRepository;
     private final FarmerRepository farmerRepository;
-    private final AiContractServiceImpl aiContractService;
+    private final AiContractService aiContractService;
 
     // ─── 1. AI Draft ────────────────────────────────────────────────────────
 

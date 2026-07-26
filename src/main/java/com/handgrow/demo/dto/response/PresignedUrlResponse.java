@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PresignedUrlResponse {
-    private String presignedUrl;
-    private String publicUrl;
+    private String uploadUrl;
+    private String fileKey;
 }
